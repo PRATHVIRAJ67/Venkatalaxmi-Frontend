@@ -1,0 +1,240 @@
+
+.testimonials-section {
+  padding: 40px 0;
+  background-color: var(--background-color, #f8f9fa);
+  position: relative;
+}
+
+
+.section-title {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-title h2 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #777;
+  margin-bottom: 5px;
+  position: relative;
+}
+
+.section-title p {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 0;
+  color: var(--default-color, #000);
+}
+
+.section-title .highlight {
+  color: var(--accent-color, #ce1212);
+  font-weight: 700;
+}
+
+
+.testimonials-slider {
+  padding-bottom: 60px;
+  margin-bottom: 20px;
+}
+
+
+.testimonial-item {
+  padding: 20px;
+}
+
+.testimonial-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-content {
+  flex: 1 1 500px;
+  border-left: 4px solid var(--accent-color, #ce1212);
+  padding-left: 30px;
+  order: 1;
+}
+
+
+.quote-content {
+  font-style: italic;
+  line-height: 1.8;
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.quote-icon-left,
+.quote-icon-right {
+  color: rgba(var(--accent-color-rgb, 206, 18, 18), 0.5);
+  font-size: 26px;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.quote-icon-left {
+  margin-right: 10px;
+  position: relative;
+  top: -2px;
+}
+
+.quote-icon-right {
+  margin-left: 10px;
+  position: relative;
+  top: 2px;
+  transform: scale(-1, -1);
+}
+
+
+.author-info {
+  margin-top: 20px;
+}
+
+.author-info h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 10px 0 5px 0;
+  color: var(--default-color, #000);
+}
+
+.author-info h4 {
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(var(--default-color-rgb, 0, 0, 0), 0.6);
+  margin: 0 0 10px 0;
+}
+
+
+.stars {
+  margin-top: 5px;
+}
+
+.stars i {
+  color: #ffc107;
+  margin-right: 3px;
+  font-size: 16px;
+}
+
+
+.testimonial-image-container {
+  flex: 0 0 auto;
+  order: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.testimonial-img {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 5px solid #fff;
+  box-shadow: 0 0 20px rgba(var(--accent-color-rgb, 206, 18, 18), 0.15);
+  transition: transform 0.3s ease;
+}
+
+.testimonial-wrapper:hover .testimonial-img {
+  transform: scale(1.05);
+}
+
+
+.testimonials-slider .swiper-pagination {
+  position: relative;
+  margin-top: 40px;
+  bottom: 0;
+}
+
+.testimonials-slider .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background-color: rgba(var(--default-color-rgb, 0, 0, 0), 0.15);
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.testimonials-slider .swiper-pagination-bullet-active {
+  background-color: var(--accent-color, #ce1212);
+  width: 25px;
+  border-radius: 6px;
+}
+
+
+@media (max-width: 992px) {
+  .testimonial-wrapper {
+    padding: 25px 20px;
+  }
+  
+  .testimonial-content {
+    flex: 1 1 100%;
+    order: 2;
+    border-left: 3px solid var(--accent-color, #ce1212);
+    padding-left: 20px;
+    margin-top: 20px;
+  }
+  
+  .testimonial-image-container {
+    order: 1;
+    margin: 0 auto 15px;
+  }
+  
+  .testimonial-img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .quote-content {
+    font-size: 15px;
+  }
+  
+  .author-info h3 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 576px) {
+  .section-title p {
+    font-size: 26px;
+  }
+  
+  .testimonial-wrapper {
+    padding: 20px 15px;
+  }
+  
+  .testimonial-content {
+    padding-left: 15px;
+  }
+  
+  .testimonial-img {
+    width: 80px;
+    height: 80px;
+    border-width: 3px;
+  }
+  
+  .quote-icon-left,
+  .quote-icon-right {
+    font-size: 20px;
+  }
+  
+  .author-info h3 {
+    font-size: 17px;
+  }
+  
+  .author-info h4 {
+    font-size: 14px;
+  }
+}

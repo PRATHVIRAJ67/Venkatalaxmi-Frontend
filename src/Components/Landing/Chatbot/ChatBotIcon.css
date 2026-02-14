@@ -1,0 +1,38 @@
+/* ChatBotIcon.css */
+
+.chat-bot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(145deg, #ffdd57, #ffe680); /* smooth yellow gradient */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 9999;
+}
+
+.chat-bot-icon:hover {
+    transform: scale(1.05);
+    box-shadow:
+        0 10px 20px rgba(0, 0, 0, 0.3),
+        inset 0 3px 6px rgba(255, 255, 255, 0.7);
+}
+
+.chat-bot-icon img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.chat-bot-icon:hover img {
+    transform: rotate(10deg);
+}

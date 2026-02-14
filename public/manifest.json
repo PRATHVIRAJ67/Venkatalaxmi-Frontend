@@ -1,0 +1,50 @@
+{
+  "name": "Venkatalakshmi Mess - Authentic South Indian Cuisine",
+  "short_name": "VK Mess",
+  "description": "Authentic South Indian cuisine in Kundapura, Udupi. Order traditional homemade meals, sweets, and professional catering services.",
+  "theme_color": "#ce1212",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "id": "/",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["food", "restaurant", "culinary", "south indian"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/Venkatalakshmi-Logo.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Order Food",
+      "short_name": "Order",
+      "description": "Start ordering your favorite South Indian dishes",
+      "url": "/order",
+      "icons": [
+        {
+          "src": "/icons/order-icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "View Cart",
+      "short_name": "Cart",
+      "description": "View your current order items",
+      "url": "/cart",
+      "icons": [
+        {
+          "src": "/icons/cart-icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

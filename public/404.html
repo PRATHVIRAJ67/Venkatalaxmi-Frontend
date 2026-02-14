@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Venkatalakshmi Mess</title>
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="description" content="Venkatalakshmi Mess - Authentic South Indian Food" />
+    <script>
+      // Advanced SPA Routing Fix for Vercel/Netlify/CDN deployments
+      // This handles direct navigation to routes like /cart, /order, etc.
+      (function() {
+        // Save the full path including hash for restoration
+        var pathname = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+        
+        // Store the URL to be redirected to
+        var fullPath = pathname + search + hash;
+        sessionStorage.setItem('redirectPath', fullPath);
+        
+        // Redirect to the root where index.html will be served
+        window.location.href = '/';
+      })();
+    </script>
+    <!-- Fallback if JavaScript is disabled -->
+    <noscript>
+      <meta http-equiv="refresh" content="0;url=/" />
+    </noscript>
+  </head>
+  <body>
+    <h1 style="text-align:center;margin-top:50px;font-family:Arial,sans-serif;">
+      Redirecting to Venkatalakshmi Mess...
+    </h1>
+    <p style="text-align:center;font-family:Arial,sans-serif;">
+      If you are not redirected, <a href="/">click here</a>.
+    </p>
+  </body>
+</html>

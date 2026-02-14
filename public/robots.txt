@@ -1,0 +1,29 @@
+# robots.txt for Venkatalakshmi Mess
+# https://www.venkatalaxmimess.in/
+
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Disallow specific paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout/processing
+Disallow: /user/account
+Disallow: /error/
+
+# Disallow serving dynamic query parameters
+Disallow: /*?*
+
+# Sitemap location
+Sitemap: https://www.venkatalaxmimess.in/sitemap.xml
+
+# Crawl delay for high-traffic bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10

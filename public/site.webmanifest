@@ -1,0 +1,12 @@
+{
+  "name": "Venkatalakshmi Mess",
+  "short_name": "VK Mess",
+  "description": "Authentic South Indian cuisine in Kundapura, Udupi",
+  "theme_color": "#ce1212",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "orientation": "portrait",
+  "lang": "en-US",
+  "dir": "ltr"
+} 

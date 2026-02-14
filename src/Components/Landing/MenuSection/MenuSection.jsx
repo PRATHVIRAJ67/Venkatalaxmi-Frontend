@@ -8,7 +8,7 @@ const MenuSection = () => {
   const [activeTab, setActiveTab] = useState('menu-starters');
   const [menuItemsFromDB, setMenuItemsFromDB] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+
   const [itemsPerPage] = useState(6);
   const navigate = useNavigate();
 
@@ -26,32 +26,32 @@ const MenuSection = () => {
         const today = new Date().toDateString();
         const cachedDay = sessionStorage.getItem('menuItemsCachedDay');
         const cachedItems = sessionStorage.getItem('menuItems');
-        
+
         // Use cached items if they exist and are from today
         if (cachedItems && cachedDay === today) {
           setMenuItemsFromDB(JSON.parse(cachedItems));
           setIsLoading(false);
           return;
         }
-        
+
         // Fetch from database if no cache or cache is from a different day
         console.log("MenuSection: Fetching menu items from database...");
         const { data, error } = await supabase
           .from('menu_items')
           .select('*')
           .order('created_at', { ascending: false });
-          
+
         if (error) {
           console.error('Error fetching menu items:', error);
           return;
         }
-        
+
         if (data) {
           // Process the fetched data to handle different types of days data
           const processedData = data.map(item => {
             // Handle different types of days data
             let parsedDays = [0, 1, 2, 3, 4, 5, 6]; // Default to all days
-            
+
             if (item.days) {
               try {
                 // Check the type of days and handle accordingly
@@ -77,17 +77,17 @@ const MenuSection = () => {
                 console.error('Error parsing days for item:', item.name, e);
               }
             }
-            
+
             return {
               ...item,
               days: parsedDays
             };
           });
-          
+
           // Cache in session storage with today's date
           sessionStorage.setItem('menuItems', JSON.stringify(processedData));
           sessionStorage.setItem('menuItemsCachedDay', today);
-          
+
           setMenuItemsFromDB(processedData);
         }
       } catch (error) {
@@ -96,16 +96,16 @@ const MenuSection = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchMenuItems();
-    
+
     // Subscribe to the table for real-time updates
     const subscription = supabase
       .channel('menu_items_changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'menu_items' 
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'menu_items'
       }, payload => {
         // Clear cache and refresh the menu when database changes
         sessionStorage.removeItem('menuItems');
@@ -113,27 +113,27 @@ const MenuSection = () => {
         fetchMenuItems();
       })
       .subscribe();
-    
+
     // Update at midnight to get new day's menu
     const setupMidnightRefresh = () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(0, 0, 0, 0);
       const timeUntilMidnight = tomorrow - new Date();
-      
+
       return setTimeout(() => {
         // Clear cache at midnight
         sessionStorage.removeItem('menuItems');
         sessionStorage.removeItem('menuItemsCachedDay');
         fetchMenuItems();
-        
+
         // Setup for the next day
         setupMidnightRefresh();
       }, timeUntilMidnight);
     };
-    
+
     const midnightTimer = setupMidnightRefresh();
-    
+
     return () => {
       clearTimeout(midnightTimer);
       subscription.unsubscribe();
@@ -153,9 +153,9 @@ const MenuSection = () => {
     // Get current day as both string and number
     const currentDay = getCurrentDayOfWeek(); // Returns string like "Monday"
     const currentDayNumber = new Date().getDay(); // Returns number 0-6
-    
 
-    
+
+
     // Create a map of all items by category for fallback
     const allItemsByCategory = {
       'menu-starters': [],
@@ -163,13 +163,13 @@ const MenuSection = () => {
       'menu-lunch': [],
       'menu-dinner': []
     };
-    
+
     // First categorize all items
     menuItemsFromDB.forEach(item => {
       const categoryId = item.category;
       if (categoryId && allItemsByCategory[categoryId]) {
         const formattedPrice = `₹${item.price}`;
-          
+
         allItemsByCategory[categoryId].push({
           ...item,
           price: formattedPrice,
@@ -182,16 +182,16 @@ const MenuSection = () => {
     menuItemsFromDB.forEach(item => {
       // Get the category based on the category field
       const categoryId = item.category;
-      
+
       // If no valid category, skip
       if (!categoryId || !result[categoryId]) {
         return;
       }
-      
+
       // Default to being available every day if days is not specified
       if (!item.days || item.days.length === 0) {
         const formattedPrice = `₹${item.price}`;
-        
+
         result[categoryId].push({
           ...item,
           price: formattedPrice,
@@ -199,43 +199,43 @@ const MenuSection = () => {
         });
         return;
       }
-      
+
       try {
         let shouldInclude = false;
-        
+
         // If days is a number
         if (typeof item.days === 'number') {
           shouldInclude = item.days === currentDayNumber;
-        } 
+        }
         // If days is an array
         else if (Array.isArray(item.days)) {
           // Check both numeric days and string days
-          shouldInclude = item.days.includes(currentDayNumber) || 
-                         item.days.includes(currentDay) || 
-                         item.days.includes(String(currentDayNumber));
-        } 
+          shouldInclude = item.days.includes(currentDayNumber) ||
+            item.days.includes(currentDay) ||
+            item.days.includes(String(currentDayNumber));
+        }
         // If days is a string, try to parse it
         else if (typeof item.days === 'string') {
           try {
             // Try to parse as JSON first
             const parsedDays = JSON.parse(item.days);
             if (Array.isArray(parsedDays)) {
-              shouldInclude = parsedDays.includes(currentDayNumber) || 
-                             parsedDays.includes(currentDay) ||
-                             parsedDays.includes(String(currentDayNumber));
+              shouldInclude = parsedDays.includes(currentDayNumber) ||
+                parsedDays.includes(currentDay) ||
+                parsedDays.includes(String(currentDayNumber));
             }
           } catch (e) {
             // If JSON parsing fails, try comma-separated values
             const daysArray = item.days.split(',').map(d => d.trim());
-            shouldInclude = daysArray.includes(String(currentDayNumber)) || 
-                           daysArray.includes(currentDay) ||
-                           daysArray.some(d => parseInt(d) === currentDayNumber);
+            shouldInclude = daysArray.includes(String(currentDayNumber)) ||
+              daysArray.includes(currentDay) ||
+              daysArray.some(d => parseInt(d) === currentDayNumber);
           }
         }
-        
+
         if (shouldInclude) {
           const formattedPrice = `₹${item.price}`;
-          
+
           result[categoryId].push({
             ...item,
             price: formattedPrice,
@@ -246,7 +246,7 @@ const MenuSection = () => {
         console.error('Error processing days for item:', item.name, e);
         // Include it anyway if there's an error
         const formattedPrice = `₹${item.price}`;
-        
+
         result[categoryId].push({
           ...item,
           price: formattedPrice,
@@ -254,7 +254,7 @@ const MenuSection = () => {
         });
       }
     });
-    
+
     // Add fallback items if any category is empty
     Object.keys(result).forEach(category => {
       if (result[category].length === 0 && allItemsByCategory[category].length > 0) {
@@ -269,10 +269,9 @@ const MenuSection = () => {
   };
 
   const menuItems = getMenuItemsByCategory();
-  
+
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
-    setCurrentPage(1); // Reset to first page when changing category
   };
 
   useEffect(() => {
@@ -285,22 +284,11 @@ const MenuSection = () => {
     navigate('/order');
   };
 
-  // Pagination logic
-  const getPaginatedItems = (categoryId) => {
+  // Display only limited items for landing page
+  const getDisplayItems = (categoryId) => {
     const items = menuItems[categoryId] || [];
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return items.slice(indexOfFirstItem, indexOfLastItem);
-  };
-
-  const totalPages = (categoryId) => {
-    return Math.ceil((menuItems[categoryId]?.length || 0) / itemsPerPage);
-  };
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    // Scroll to top of the menu section for better UX
-    document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
+    // Show only the first page items (e.g. 6 items)
+    return items.slice(0, itemsPerPage);
   };
 
   if (isLoading) {
@@ -326,7 +314,7 @@ const MenuSection = () => {
           <ul className="menu-tabs">
             {menuCategories.map((category) => (
               <li key={category.id} className="menu-tab-item">
-                <button 
+                <button
                   className={`menu-tab-button ${activeTab === category.id ? 'active' : ''}`}
                   onClick={() => handleTabChange(category.id)}
                 >
@@ -340,7 +328,7 @@ const MenuSection = () => {
 
         <div className="menu-content" data-aos="fade-up" data-aos-delay="200">
           {menuCategories.map((category) => (
-            <div 
+            <div
               key={category.id}
               className={`menu-tab-content ${activeTab === category.id ? 'active' : ''}`}
               id={category.id}
@@ -351,8 +339,8 @@ const MenuSection = () => {
               </div>
 
               <div className="menu-items-grid">
-                {getPaginatedItems(category.id).length > 0 ? (
-                  getPaginatedItems(category.id).map((item, index) => (
+                {getDisplayItems(category.id).length > 0 ? (
+                  getDisplayItems(category.id).map((item, index) => (
                     <div className="menu-item" key={item.id || index} onClick={handleCardClick}>
                       <div className="menu-item-img-container">
                         <img
@@ -387,39 +375,7 @@ const MenuSection = () => {
                   </div>
                 )}
               </div>
-              
-              {/* Pagination controls */}
-              {totalPages(category.id) > 1 && (
-                <div className="simple-pagination">
-                  <button 
-                    className="pagination-arrow" 
-                    disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                  >
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                  
-                  <div className="pagination-numbers">
-                    {[...Array(totalPages(category.id))].map((_, i) => (
-                      <button
-                        key={i + 1}
-                        className={`pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  <button 
-                    className="pagination-arrow" 
-                    disabled={currentPage === totalPages(category.id)}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </div>
-              )}
+
             </div>
           ))}
         </div>

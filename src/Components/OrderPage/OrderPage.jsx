@@ -4,7 +4,7 @@ import './OrderPage.css';
 import { AiOutlinePlus, AiOutlineMinus, AiOutlineArrowLeft } from 'react-icons/ai';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock } from '@fortawesome/free-solid-svg-icons';
-import { supabase } from '../utils/supabaseClient';
+import { fetchMenuItems as fetchMenuItemsAPI } from './service';
 import useSEO from '../hooks/useSEO';
 import { useCart } from '../hooks/useCart';
 import { LoadingSpinner, LoadingOverlay } from '../common/LoadingSpinner';
@@ -31,10 +31,10 @@ const getCurrentTimeInfo = () => {
   const now = new Date();
   const hours = now.getHours();
   const minutes = now.getMinutes();
-  
+
   // Convert to 24-hour format for easy comparison
   const time = hours * 100 + minutes; // e.g., 9:30 AM = 930, 2:45 PM = 1445
-  
+
   return {
     hours,
     minutes,
@@ -45,35 +45,35 @@ const getCurrentTimeInfo = () => {
 const getAvailableCategories = () => {
   const { time } = getCurrentTimeInfo();
   const day = getCurrentDayOfWeek();
-  
+
   // Default to all categories available
   const categories = [];
-  
+
   // Always show starters/sweets regardless of time
-  categories.push('menu-starters','menu-dinner');
-  
+  categories.push('menu-starters', 'menu-dinner');
+
   // Breakfast: 7 AM to 11:30 AM (700 to 1130)
   if (time >= 700 && time <= 1130) {
     categories.push('menu-breakfast');
   }
-  
+
   // Lunch: 11:30 AM to 4 PM (1130 to 1600)
   if (time >= 1130 && time <= 1600) {
     categories.push('menu-lunch');
   }
-  
+
   // Dinner: 4 PM to 10 PM (1600 to 2200)
   // if (time >= 1600 && time <= 2200) {
   //   categories.push('menu-dinner');
   // }
-  
+
   return categories;
 };
 
 const OrderPage = () => {
   // Apply SEO metadata for the order page
   useSEO('ORDER');
-  
+
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('menu-starters');
   const [cart, setCart] = useState([]);
@@ -81,12 +81,12 @@ const OrderPage = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [currentDayOfWeek, setCurrentDayOfWeek] = useState(getCurrentDayOfWeek());
-  const [menuItemsFromDB, setMenuItemsFromDB] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [editingQuantity, setEditingQuantity] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(17);
-  
+  const [totalPagesFromServer, setTotalPagesFromServer] = useState(1);
+
   const cartRef = useRef(null);
   const [position, setPosition] = useState({ top: 80, left: 0 });
   const [dragging, setDragging] = useState(false);
@@ -94,89 +94,44 @@ const OrderPage = () => {
   const { cart: cartFromUseCart, setCart: setCartFromUseCart } = useCart();
   const [daySpecificMenu, setDaySpecificMenu] = useState({});
 
-  // Fetch menu items from session storage or Supabase
+  // Fetch menu items from the backend API with server-side pagination per category
   useEffect(() => {
-    const fetchMenuItems = async () => {
+    const loadMenuItems = async () => {
       try {
         setIsLoading(true);
-        
+
         // Get initial list of available menu categories based on time
         setAvailableCategories(getAvailableCategories());
-        
-        // Check if we have cached menu items and if they're from today
-        const today = new Date().toDateString();
-        const cachedDay = sessionStorage.getItem('menuItemsCachedDay');
-        const cachedItems = sessionStorage.getItem('menuItems');
-        
-        // Use cached items if they exist and are from today
-        if (cachedItems && cachedDay === today) {
-          const parsedItems = JSON.parse(cachedItems);
-          setMenuItemsFromDB(parsedItems);
-          const processedMenu = processDaysString(parsedItems);
-          setDaySpecificMenu(processedMenu);
-        } else {
-          // Fetch from database if no cache or cache is from a different day
-          console.log("OrderPage: Fetching menu items from database...");
-          const { data, error } = await supabase
-            .from('menu_items')
-            .select('*')
-            .order('created_at', { ascending: false });
-          
-          if (error) {
-            console.error('Error fetching menu items:', error);
-            return;
-          }
-          
-          // Store all menu items from database
-          const menuData = data || [];
-          setMenuItemsFromDB(menuData);
-          
-          // Cache in session storage with today's date
-          sessionStorage.setItem('menuItems', JSON.stringify(menuData));
-          sessionStorage.setItem('menuItemsCachedDay', today);
-          
-          // Process menu items to get day-specific menu
-          const processedMenu = processDaysString(menuData);
-          setDaySpecificMenu(processedMenu);
-        }
-        
-        // Subscribe to the table for real-time updates
-        const subscription = supabase
-          .channel('menu_items_changes')
-          .on('postgres_changes', { 
-            event: '*', 
-            schema: 'public', 
-            table: 'menu_items' 
-          }, payload => {
-            // Clear cache and refresh the menu when database changes
-            sessionStorage.removeItem('menuItems');
-            sessionStorage.removeItem('menuItemsCachedDay');
-            fetchMenuItems();
-          })
-          .subscribe();
-        
-        // Clean up subscription when component unmounts
-        return () => {
-          subscription.unsubscribe();
-        };
-        
+
+        // Fetch 15 items for the active category with server-side pagination
+        const response = await fetchMenuItemsAPI(currentPage, 15, activeTab);
+        const menuData = response?.data?.menuItems || response?.menuItems || [];
+        const pagination = response?.data?.pagination || response?.pagination || {};
+
+        // Store server pagination info
+        setTotalPagesFromServer(pagination.totalPages || 1);
+
+        // Process menu items to get day-specific menu grouped by category
+        const processedMenu = processDaysString(menuData);
+        setDaySpecificMenu(processedMenu);
+
       } catch (error) {
-        console.error('Error processing menu items:', error);
+        console.error('Error fetching menu items:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    
-    fetchMenuItems();
-    
+
+    loadMenuItems();
+
     // Set up an interval to update available categories based on time
     const intervalId = setInterval(() => {
       setAvailableCategories(getAvailableCategories());
     }, 60000); // Check every minute
-    
+
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
-  }, []);
+  }, [currentPage, activeTab]);
 
   useEffect(() => {
     // Set responsive initial position once cartRef is available
@@ -253,35 +208,21 @@ const OrderPage = () => {
     // Get the current day of the week
     const currentDay = getCurrentDayOfWeek();
     setCurrentDayOfWeek(currentDay);
-    
-    // Check if we need to clear the cache based on date change
-    const today = new Date().toDateString();
-    const cachedDay = sessionStorage.getItem('menuItemsCachedDay');
-    
-    // If cached day doesn't match today, clear the cache
-    if (cachedDay && cachedDay !== today) {
-      sessionStorage.removeItem('menuItems');
-      sessionStorage.removeItem('menuItemsCachedDay');
-    }
-    
+
     // Update day of week every day at midnight
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
     const timeUntilMidnight = tomorrow - new Date();
-    
+
     const dayTimer = setTimeout(() => {
       const newDay = getCurrentDayOfWeek();
       setCurrentDayOfWeek(newDay);
-      
-      // Clear cache at midnight
-      sessionStorage.removeItem('menuItems');
-      sessionStorage.removeItem('menuItemsCachedDay');
-      
+
       // Refresh menu items for the new day
       window.location.reload();
     }, timeUntilMidnight);
-    
+
     return () => clearTimeout(dayTimer);
   }, []);
 
@@ -289,7 +230,7 @@ const OrderPage = () => {
   const updateAvailableCategories = () => {
     const available = getAvailableCategories();
     setAvailableCategories(available);
-    
+
     // If the current active tab is not available, switch to an available one
     if (!available.includes(activeTab)) {
       setActiveTab(available[0]);
@@ -299,24 +240,24 @@ const OrderPage = () => {
   // Initialize available categories and set up an interval to update them
   useEffect(() => {
     updateAvailableCategories();
-    
+
     // Update available categories every minute
     const intervalId = setInterval(updateAvailableCategories, 60000);
-    
+
     return () => clearInterval(intervalId);
   }, []);
-  
+
   useEffect(() => {
     const storedCart = sessionStorage.getItem('cart');
     if (storedCart) {
       setCart(JSON.parse(storedCart));
-      
+
       const total = JSON.parse(storedCart).reduce((acc, item) => {
         return acc + (item.price * item.quantity);
       }, 0);
       setTotalAmount(total);
     }
-    
+
     // Set initial active tab based on available categories
     if (availableCategories.length > 0 && !availableCategories.includes(activeTab)) {
       setActiveTab(availableCategories[0]);
@@ -356,12 +297,12 @@ const OrderPage = () => {
   // Modified handleQuantityChange function to handle special rules for sweets and snacks
   const handleQuantityChange = (itemId, action, category) => {
     const itemIndex = cart.findIndex(item => item.id === itemId);
-    
+
     if (itemIndex !== -1) {
       const updatedCart = [...cart];
       const isSweetsCategory = category === 'menu-starters';
       const isSnacksCategory = category === 'menu-dinner';
-      
+
       if (action === 'add') {
         // For sweets, increment by 10; for others by 1
         const incrementAmount = isSweetsCategory ? 10 : 1;
@@ -392,7 +333,7 @@ const OrderPage = () => {
           }
         }
       }
-      
+
       updateCart(updatedCart);
     }
   };
@@ -403,26 +344,26 @@ const OrderPage = () => {
     const isSweetsCategory = category === 'menu-starters';
     const isSnacksCategory = category === 'menu-dinner';
     let minQuantity = 1;
-    
+
     if (isSweetsCategory) {
       minQuantity = 50;
     } else if (isSnacksCategory) {
       minQuantity = 10;
     }
-    
+
     // Parse input as integer
     let newQuantity = parseInt(value, 10);
-    
+
     // If input is not a valid number, keep existing quantity
     if (isNaN(newQuantity)) {
       return;
     }
-    
+
     // Enforce minimum quantity rules
     if (isSweetsCategory) {
       // Ensure quantity is a multiple of 10 for sweets
       newQuantity = Math.ceil(newQuantity / 10) * 10;
-      
+
       // Enforce minimum quantity of 50 for sweets
       if (newQuantity < 50) {
         newQuantity = 50;
@@ -438,13 +379,13 @@ const OrderPage = () => {
         newQuantity = 1;
       }
     }
-    
+
     if (itemIndex !== -1) {
       const updatedCart = [...cart];
       updatedCart[itemIndex].quantity = newQuantity;
       updateCart(updatedCart);
     }
-    
+
     // Exit edit mode
     setEditingQuantity(null);
   };
@@ -471,14 +412,14 @@ const OrderPage = () => {
     const isSweetsCategory = category === 'menu-starters';
     const isSnacksCategory = category === 'menu-dinner';
     let initialQuantity = 1;
-    
+
     // Set initial quantity based on category
     if (isSweetsCategory) {
       initialQuantity = 50;
     } else if (isSnacksCategory) {
       initialQuantity = 10;
     }
-    
+
     if (existingItemIndex !== -1) {
       const updatedCart = [...cart];
       // For sweets, increment by 10, for others by 1
@@ -488,7 +429,7 @@ const OrderPage = () => {
     } else {
       updateCart([...cart, { ...item, quantity: initialQuantity }]);
     }
-    
+
     const notification = document.getElementById('cart-notification');
     notification.classList.add('show');
     setTimeout(() => {
@@ -508,16 +449,9 @@ const OrderPage = () => {
     setCartOpen(false);
   };
 
-  // Pagination logic
-  const getPaginatedItems = (categoryId) => {
-    const items = daySpecificMenu[categoryId] || [];
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return items.slice(indexOfFirstItem, indexOfLastItem);
-  };
-
-  const totalPages = (categoryId) => {
-    return Math.ceil((daySpecificMenu[categoryId]?.length || 0) / itemsPerPage);
+  // Items are already paginated from server, show directly
+  const getItemsForCategory = (categoryId) => {
+    return daySpecificMenu[categoryId] || [];
   };
 
   const handlePageChange = (pageNumber) => {
@@ -537,13 +471,13 @@ const OrderPage = () => {
       'menu-lunch': [],
       'menu-dinner': []
     };
-    
+
     // Get current day as both string and number
     const currentDay = getCurrentDayOfWeek(); // Returns string like "Monday"
     const currentDayNumber = new Date().getDay(); // Returns number 0-6
-    
 
-    
+
+
     // Create a map to categorize all items first
     const allItemsByCategory = {
       'menu-starters': [],
@@ -551,60 +485,67 @@ const OrderPage = () => {
       'menu-lunch': [],
       'menu-dinner': []
     };
-    
+
     // First pass - add all items to their categories
     menuItems.forEach(item => {
       if (item.category && allItemsByCategory[item.category]) {
         allItemsByCategory[item.category].push(item);
       }
     });
-    
+
     // Second pass - filter by day
     menuItems.forEach(item => {
       // If no category, skip item
       if (!item.category || !result[item.category]) {
         return;
       }
-      
+
       // Default to being available every day if days is not specified
       if (!item.days || item.days.length === 0) {
         result[item.category].push(item);
         return;
       }
-      
+
       try {
         let shouldInclude = false;
-        
-        // If days is a number or array of numbers, check against currentDayNumber
-        if (typeof item.days === 'number') {
-          shouldInclude = item.days === currentDayNumber;
-        } 
-        // If days is an array
-        else if (Array.isArray(item.days)) {
-          // Check both numeric days and string days
-          shouldInclude = item.days.includes(currentDayNumber) || 
-                          item.days.includes(currentDay) || 
-                          item.days.includes(String(currentDayNumber));
-        } 
+
+        // Normalize days: extract the array from object format { days: [...] }
+        let daysValue = item.days;
+        if (daysValue && typeof daysValue === 'object' && !Array.isArray(daysValue) && Array.isArray(daysValue.days)) {
+          daysValue = daysValue.days;
+        }
+
+        // If days is a number, check against currentDayNumber
+        if (typeof daysValue === 'number') {
+          shouldInclude = daysValue === currentDayNumber;
+        }
+        // If days is an array (e.g. ["Monday", "Tuesday", ...])
+        else if (Array.isArray(daysValue)) {
+          shouldInclude = daysValue.includes(currentDayNumber) ||
+            daysValue.includes(currentDay) ||
+            daysValue.includes(String(currentDayNumber));
+        }
         // If days is a string, try to parse it
-        else if (typeof item.days === 'string') {
+        else if (typeof daysValue === 'string') {
           try {
-            // Try to parse as JSON first
-            const parsedDays = JSON.parse(item.days);
+            const parsedDays = JSON.parse(daysValue);
             if (Array.isArray(parsedDays)) {
-              shouldInclude = parsedDays.includes(currentDayNumber) || 
-                              parsedDays.includes(currentDay) ||
-                              parsedDays.includes(String(currentDayNumber));
+              shouldInclude = parsedDays.includes(currentDayNumber) ||
+                parsedDays.includes(currentDay) ||
+                parsedDays.includes(String(currentDayNumber));
+            } else if (parsedDays && typeof parsedDays === 'object' && Array.isArray(parsedDays.days)) {
+              shouldInclude = parsedDays.days.includes(currentDayNumber) ||
+                parsedDays.days.includes(currentDay) ||
+                parsedDays.days.includes(String(currentDayNumber));
             }
           } catch (e) {
-            // If JSON parsing fails, try comma-separated values
-            const daysArray = item.days.split(',').map(d => d.trim());
-            shouldInclude = daysArray.includes(String(currentDayNumber)) || 
-                            daysArray.includes(currentDay) ||
-                            daysArray.some(d => parseInt(d) === currentDayNumber);
+            const daysArray = daysValue.split(',').map(d => d.trim());
+            shouldInclude = daysArray.includes(String(currentDayNumber)) ||
+              daysArray.includes(currentDay) ||
+              daysArray.some(d => parseInt(d) === currentDayNumber);
           }
         }
-        
+
         if (shouldInclude) {
           result[item.category].push(item);
         }
@@ -614,7 +555,7 @@ const OrderPage = () => {
         result[item.category].push(item);
       }
     });
-    
+
     // FALLBACK: If any category is empty, add at least 2 items from all items
     Object.keys(result).forEach(category => {
       if (result[category].length === 0 && allItemsByCategory[category].length > 0) {
@@ -624,7 +565,7 @@ const OrderPage = () => {
         result[category].push(...itemsToAdd);
       }
     });
-    
+
     return result;
   };
 
@@ -633,7 +574,7 @@ const OrderPage = () => {
       <div id="cart-notification" className="cart-notification">
         <i className="bi bi-check-circle"></i> Item added to cart
       </div>
-    
+
       {/* Desktop Cart Button */}
       <div className="cart-section desktop-only"
         ref={cartRef}
@@ -655,7 +596,7 @@ const OrderPage = () => {
           </div>
         </Link>
       </div>
-      
+
       {/* Mobile Cart Button (circular) */}
       <Link to="/cart" className="mobile-cart-button mobile-only">
         <div className="mobile-cart-icon">
@@ -664,7 +605,7 @@ const OrderPage = () => {
         </div>
         <span className="mobile-cart-text">View Cart</span>
       </Link>
-      
+
       <div className="container">
         <div className="order-header">
           <Link to="/" className="back-button" title="Back to menu">
@@ -673,14 +614,14 @@ const OrderPage = () => {
           <h1>Order Your Food</h1>
           <div className="spacer"></div>
         </div>
-        
+
         <div className="menu-tabs-wrapper" id="menu-tabs">
           <ul className="menu-tabs">
             {menuCategories.map((category) => {
               const isAvailable = availableCategories.includes(category.id);
               return (
                 <li key={category.id} className="menu-tab-item">
-                  <button 
+                  <button
                     className={`menu-tab-button ${activeTab === category.id ? 'active' : ''} ${!isAvailable ? 'disabled' : ''}`}
                     onClick={() => handleTabChange(category.id)}
                     disabled={!isAvailable}
@@ -698,7 +639,7 @@ const OrderPage = () => {
             })}
           </ul>
         </div>
-        
+
         <div className="menu-content">
           {isLoading ? (
             <div className="loading-spinner-container">
@@ -706,7 +647,7 @@ const OrderPage = () => {
             </div>
           ) : (
             menuCategories.map((category) => (
-              <div 
+              <div
                 key={category.id}
                 className={`menu-tab-content ${activeTab === category.id ? 'active' : ''}`}
                 id={category.id}
@@ -726,16 +667,16 @@ const OrderPage = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {availableCategories.includes(category.id) ? (
                   <>
                     <div className="order-items-grid">
-                      {getPaginatedItems(category.id).length > 0 ? (
-                        getPaginatedItems(category.id).map((item) => {
+                      {getItemsForCategory(category.id).length > 0 ? (
+                        getItemsForCategory(category.id).map((item) => {
                           const cartItem = cart.find(cartItem => cartItem.id === item.id);
                           const quantity = cartItem ? cartItem.quantity : 0;
                           const isSweetsCategory = category.id === 'menu-starters';
-                          
+
                           return (
                             <div className="order-item" key={item.id}>
                               <div className="order-item-img-container">
@@ -759,7 +700,7 @@ const OrderPage = () => {
                                 <h4>{item.name.replace(/([a-zA-Z])\(/, '$1      (')}</h4>
                                 <p className="ingredients">{item.description}</p>
                                 <p className="price">₹{item.price} {item.unit && `(${item.unit})`}</p>
-                                
+
                                 <div className="order-actions">
                                   {quantity > 0 ? (
                                     <div className="quantity-selector">
@@ -770,7 +711,7 @@ const OrderPage = () => {
                                       >
                                         <AiOutlineMinus style={{ color: 'black' }} />
                                       </button>
-                                      
+
                                       {editingQuantity === item.id ? (
                                         <input
                                           type="number"
@@ -786,13 +727,13 @@ const OrderPage = () => {
                                         />
                                       ) : (
                                         <>
-                                          <span 
+                                          <span
                                             className="quantity"
                                             onClick={() => !isSweetsCategory && handleQuantityInputFocus(item.id)}
                                           >
                                             {quantity}
                                           </span>
-                                          { (
+                                          {(
                                             <button
                                               className="quantity-edit-btn"
                                               onClick={() => handleQuantityInputFocus(item.id)}
@@ -805,7 +746,7 @@ const OrderPage = () => {
                                           )}
                                         </>
                                       )}
-                                      
+
                                       <button
                                         onClick={() => handleQuantityChange(item.id, 'add', category.id)}
                                         className="quantity-btn"
@@ -815,8 +756,8 @@ const OrderPage = () => {
                                       </button>
                                     </div>
                                   ) : (
-                                    <button 
-                                      className="add-to-cart-button" 
+                                    <button
+                                      className="add-to-cart-button"
                                       onClick={() => addToCart(item, category.id)}
                                       aria-label={isSweetsCategory ? 'Add 50 pieces to cart' : (category.id === 'menu-dinner' ? 'Add 10 packs to cart' : 'Add to cart')}
                                     >
@@ -834,20 +775,20 @@ const OrderPage = () => {
                         </div>
                       )}
                     </div>
-                    
-                    {/* Simple pagination controls */}
-                    {totalPages(category.id) > 1 && (
+
+                    {/* Server-side pagination controls */}
+                    {totalPagesFromServer > 1 && (
                       <div className="simple-pagination">
-                        <button 
+                        <button
                           onClick={() => handlePageChange(currentPage - 1)}
                           disabled={currentPage === 1}
                           className="pagination-arrow"
                         >
                           <i className="bi bi-chevron-left"></i>
                         </button>
-                        
+
                         <div className="pagination-numbers">
-                          {[...Array(totalPages(category.id))].map((_, i) => (
+                          {[...Array(totalPagesFromServer)].map((_, i) => (
                             <button
                               key={i + 1}
                               className={`pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
@@ -857,10 +798,10 @@ const OrderPage = () => {
                             </button>
                           ))}
                         </div>
-                        
-                        <button 
+
+                        <button
                           onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={currentPage === totalPages(category.id)}
+                          disabled={currentPage === totalPagesFromServer}
                           className="pagination-arrow"
                         >
                           <i className="bi bi-chevron-right"></i>

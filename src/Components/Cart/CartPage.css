@@ -81,6 +81,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -91,15 +92,19 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
 }
 
 @keyframes bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
@@ -430,7 +435,7 @@
   .cart-header h1 {
     font-size: 28px;
   }
-  
+
   .cart-header h1::before {
     font-size: 28px;
   }
@@ -441,52 +446,181 @@
     margin-bottom: 15px;
     align-self: flex-start;
   }
-  
+
   .cart-header {
     padding: 20px 15px;
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .cart-header .review {
     text-align: left;
     font-size: 14px;
   }
-  
+
   .cart-items-header {
     display: none;
   }
-  
+
   .cart-item-row {
     grid-template-columns: 1fr;
     gap: 15px;
     padding: 20px 0;
   }
-  
-  .price-col, .quantity-col, .subtotal-col, .action-col {
+
+  .price-col,
+  .quantity-col,
+  .subtotal-col,
+  .action-col {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  
-  .price-col::before, .quantity-col::before, .subtotal-col::before {
+
+  .price-col::before,
+  .quantity-col::before,
+  .subtotal-col::before {
     content: attr(data-label);
     font-weight: 600;
   }
-  
+
   .price-col::before {
     content: "Price:";
   }
-  
+
   .quantity-col::before {
     content: "Quantity:";
   }
-  
+
   .subtotal-col::before {
     content: "Subtotal:";
   }
-  
+
   .action-col {
     justify-content: flex-end;
+  }
+}
+
+/* Confirmation Dialog */
+.confirm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.confirm-dialog {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.confirm-dialog-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.confirm-dialog-icon i {
+  font-size: 28px;
+  color: #e65100;
+}
+
+.confirm-dialog h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.confirm-dialog p {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.confirm-dialog-cancel,
+.confirm-dialog-confirm {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.confirm-dialog-cancel {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.confirm-dialog-cancel:hover {
+  background: #e0e0e0;
+}
+
+.confirm-dialog-confirm {
+  background: linear-gradient(135deg, #ce1212, #ff4444);
+  color: #fff;
+}
+
+.confirm-dialog-confirm:hover {
+  background: linear-gradient(135deg, #b00, #e03030);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(206, 18, 18, 0.3);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .confirm-dialog {
+    padding: 24px 20px;
+    margin: 0 16px;
+  }
+
+  .confirm-dialog-actions {
+    flex-direction: column;
+  }
+
+  .confirm-dialog-confirm {
+    order: -1;
   }
 }

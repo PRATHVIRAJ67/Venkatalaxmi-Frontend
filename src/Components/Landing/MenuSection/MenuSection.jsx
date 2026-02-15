@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MenuSection.css';
-import { supabase } from '../../utils/supabaseClient';
+
+import { fetchMenuItems } from '../../../services/menuService';
 import { getCurrentDayOfWeek } from '../../OrderPage/menuData';
 
 const MenuSection = () => {
@@ -20,99 +21,22 @@ const MenuSection = () => {
   ];
 
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        // Check if we have cached menu items and if they're from today
-        const today = new Date().toDateString();
-        const cachedDay = sessionStorage.getItem('menuItemsCachedDay');
-        const cachedItems = sessionStorage.getItem('menuItems');
+    const fetchItems = async () => {
+      setIsLoading(true);
+      const { data, error } = await fetchMenuItems();
 
-        // Use cached items if they exist and are from today
-        if (cachedItems && cachedDay === today) {
-          setMenuItemsFromDB(JSON.parse(cachedItems));
-          setIsLoading(false);
-          return;
-        }
-
-        // Fetch from database if no cache or cache is from a different day
-        console.log("MenuSection: Fetching menu items from database...");
-        const { data, error } = await supabase
-          .from('menu_items')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching menu items:', error);
-          return;
-        }
-
-        if (data) {
-          // Process the fetched data to handle different types of days data
-          const processedData = data.map(item => {
-            // Handle different types of days data
-            let parsedDays = [0, 1, 2, 3, 4, 5, 6]; // Default to all days
-
-            if (item.days) {
-              try {
-                // Check the type of days and handle accordingly
-                if (Array.isArray(item.days)) {
-                  // If it's already an array, use it directly
-                  parsedDays = item.days;
-                } else if (typeof item.days === 'string') {
-                  // If it's a string, try to parse as JSON or split by comma
-                  try {
-                    parsedDays = JSON.parse(item.days);
-                  } catch {
-                    // If JSON parsing fails, try comma splitting
-                    parsedDays = item.days.split(',').map(day => parseInt(day.trim(), 10));
-                  }
-                } else if (typeof item.days === 'number') {
-                  // If it's a single number, make it an array
-                  parsedDays = [item.days];
-                } else if (typeof item.days === 'object' && item.days.days) {
-                  // Handle nested days object
-                  parsedDays = item.days.days;
-                }
-              } catch (e) {
-                console.error('Error parsing days for item:', item.name, e);
-              }
-            }
-
-            return {
-              ...item,
-              days: parsedDays
-            };
-          });
-
-          // Cache in session storage with today's date
-          sessionStorage.setItem('menuItems', JSON.stringify(processedData));
-          sessionStorage.setItem('menuItemsCachedDay', today);
-
-          setMenuItemsFromDB(processedData);
-        }
-      } catch (error) {
-        console.error('Error processing menu items:', error);
-      } finally {
-        setIsLoading(false);
+      if (error) {
+        console.error('Error fetching menu items:', error);
+      } else {
+        setMenuItemsFromDB(data || []);
       }
+      setIsLoading(false);
     };
 
-    fetchMenuItems();
+    fetchItems();
 
-    // Subscribe to the table for real-time updates
-    const subscription = supabase
-      .channel('menu_items_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'menu_items'
-      }, payload => {
-        // Clear cache and refresh the menu when database changes
-        sessionStorage.removeItem('menuItems');
-        sessionStorage.removeItem('menuItemsCachedDay');
-        fetchMenuItems();
-      })
-      .subscribe();
+    // We removed real-time subscriptions to avoid Supabase usage
+    // Using simple periodic refresh or just refresh on mount is sufficient for now
 
     // Update at midnight to get new day's menu
     const setupMidnightRefresh = () => {
@@ -125,7 +49,7 @@ const MenuSection = () => {
         // Clear cache at midnight
         sessionStorage.removeItem('menuItems');
         sessionStorage.removeItem('menuItemsCachedDay');
-        fetchMenuItems();
+        fetchItems();
 
         // Setup for the next day
         setupMidnightRefresh();
@@ -136,7 +60,6 @@ const MenuSection = () => {
 
     return () => {
       clearTimeout(midnightTimer);
-      subscription.unsubscribe();
     };
   }, []);
 

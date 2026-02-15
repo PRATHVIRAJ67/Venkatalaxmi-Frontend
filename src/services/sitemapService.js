@@ -6,26 +6,28 @@
  */
 
 // Direct import to avoid environment variable issues during Vite config loading
-import { createClient } from "@supabase/supabase-js";
+// import { createClient } from "@supabase/supabase-js"; // REMOVED
 
 // Use hardcoded fallbacks to ensure this works during config loading
-const supabaseUrl = "https://azzfgtymixbbseinydfo.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6emZndHltaXhiYnNlaW55ZGZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzODY4NzgsImV4cCI6MjA2MDk2Mjg3OH0.klA9RjID-wT3FIrFaU1VLfhHl0RVKXg7CX3lcoIWf08";
+// const supabaseUrl = ...; // REMOVED
+// const supabaseKey = ...; // REMOVED
 
 // Create a supabase client for sitemap generation
-const supabase = createClient(supabaseUrl, supabaseKey);
+// const supabase = createClient(supabaseUrl, supabaseKey); // REMOVED
 
 /**
  * Generate the sitemap XML content
  * 
  * @param {Object} options - The sitemap generation options
  * @param {string} options.baseUrl - The base URL of the website (e.g., https://venkatalakshmimess.com)
+ * @param {string} options.apiBaseUrl - The base URL of the API (e.g., http://localhost:5000/api)
  * @param {Array} options.staticPages - Array of static page paths without the domain (e.g., ["/", "/about", "/contact"])
  * @param {boolean} options.includeDynamicMenu - Whether to include dynamic menu pages from the database
  * @returns {Promise<string>} The XML content of the sitemap
  */
 export const generateSitemapXml = async ({
   baseUrl = 'https://www.venkatalaxmimess.in/',
+  apiBaseUrl = 'http://localhost:5000/api', // Default API URL
   staticPages = [
     '/',
     '/order',
@@ -37,40 +39,47 @@ export const generateSitemapXml = async ({
   // Start the XML content
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-  
+
   // Add static pages
   for (const path of staticPages) {
     xml += generateUrlEntry(`${baseUrl}${path}`, '1.0', 'daily');
   }
-  
+
   // Add dynamic menu pages if requested
   if (includeDynamicMenu) {
     try {
-      // Fetch menu categories from Supabase
-      const { data: categories, error } = await supabase
-        .from('menu_categories')
-        .select('id, name, slug')
-        .order('display_order', { ascending: true });
-      
-      if (error) {
-        console.error('Error fetching menu categories for sitemap:', error);
-      } else if (categories && categories.length > 0) {
-        // Add category pages to sitemap
-        for (const category of categories) {
-          if (category.slug) {
-            xml += generateUrlEntry(`${baseUrl}/menu/${category.slug}`, '0.8', 'weekly');
+      // Fetch menu categories from API
+      // We'll use the native fetch API here to keep dependencies minimal in this service
+      // Note: In Node.js environment (during build), fetch is available in newer versions (Node 18+)
+
+      const categoriesResponse = await fetch(`${apiBaseUrl}/menu-categories`);
+
+      if (!categoriesResponse.ok) {
+        console.error('Error fetching menu categories for sitemap:', categoriesResponse.statusText);
+      } else {
+        const categories = await categoriesResponse.json();
+
+        if (categories && categories.length > 0) {
+          // Add category pages to sitemap
+          for (const category of categories) {
+            if (category.slug) {
+              xml += generateUrlEntry(`${baseUrl}/menu/${category.slug}`, '0.8', 'weekly');
+            }
           }
         }
-        
-        // Fetch menu items for additional pages
-        const { data: menuItems, error: menuError } = await supabase
-          .from('menu_items')
-          .select('id, title, slug')
-          .order('created_at', { ascending: false });
-        
-        if (menuError) {
-          console.error('Error fetching menu items for sitemap:', menuError);
-        } else if (menuItems && menuItems.length > 0) {
+      }
+
+      // Fetch menu items for additional pages
+      const itemsResponse = await fetch(`${apiBaseUrl}/menu-items`);
+
+      if (!itemsResponse.ok) {
+        console.error('Error fetching menu items for sitemap:', itemsResponse.statusText);
+      } else {
+        // API might return array directly or object with data
+        let menuItems = await itemsResponse.json();
+        if (menuItems.data) menuItems = menuItems.data;
+
+        if (menuItems && Array.isArray(menuItems) && menuItems.length > 0) {
           // Add individual menu item pages to sitemap
           for (const item of menuItems) {
             if (item.slug) {
@@ -79,14 +88,15 @@ export const generateSitemapXml = async ({
           }
         }
       }
+
     } catch (err) {
       console.error('Error generating dynamic menu sitemap entries:', err);
     }
   }
-  
+
   // Close the XML content
   xml += '</urlset>';
-  
+
   return xml;
 };
 
@@ -100,7 +110,7 @@ export const generateSitemapXml = async ({
  */
 const generateUrlEntry = (url, priority = '0.5', changefreq = 'monthly') => {
   const today = new Date().toISOString().split('T')[0];
-  
+
   return `  <url>
     <loc>${url}</loc>
     <lastmod>${today}</lastmod>
@@ -119,7 +129,7 @@ export const sitemapMiddleware = (options) => {
   return async (req, res) => {
     try {
       const xml = await generateSitemapXml(options);
-      
+
       // Set the content type to XML
       res.setHeader('Content-Type', 'application/xml');
       res.send(xml);
@@ -153,7 +163,7 @@ export const sitemapViteHandler = (options) => {
   return async (req, res) => {
     try {
       const xml = await generateSitemapXml(options);
-      
+
       // Set the content type to XML
       res.setHeader('Content-Type', 'application/xml');
       res.end(xml);

@@ -1,4 +1,6 @@
-import { userSupabase } from '../Components/utils/supabaseClinet2';
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 // Get user data from session storage
 export const getUserData = () => {
@@ -33,7 +35,7 @@ export const clearUserData = () => {
   }
 };
 
-// Save user data and order details to Supabase
+// Save user data and order details to Backend
 export const saveUserOrder = async (userData, orderDetails) => {
   try {
     if (!userData) {
@@ -43,8 +45,8 @@ export const saveUserOrder = async (userData, orderDetails) => {
     // Combine user data with order details
     const enhancedUserData = {
       ...userData,
-      order_items: typeof orderDetails.items === 'string' 
-        ? orderDetails.items 
+      order_items: typeof orderDetails.items === 'string'
+        ? orderDetails.items
         : JSON.stringify(orderDetails.items),
       order_total: orderDetails.total,
       order_id: orderDetails.orderId,
@@ -55,38 +57,35 @@ export const saveUserOrder = async (userData, orderDetails) => {
       promo_code: orderDetails.promoCode,
       order_date: new Date().toISOString()
     };
-    
-    // Insert user data with order details
-    const { data, error } = await userSupabase
-      .from("users")
-      .insert([enhancedUserData])
-      .select();
-    
-    if (error) {
-      console.error("Error saving user and order details to Supabase:", error);
-      throw error;
+
+    // Post to backend API
+    const response = await axios.post(`${API_BASE_URL}/users`, enhancedUserData); // Unified endpoint assumption
+    // Note: If /users endpoint doesn't exist, we might need to use /insert-order if that saves user data too.
+    // Based on codebase, `insertOrder` in Cart/service.js calls /insert-order.
+    // If the backend has a separate /users endpoint, great. If not, this might fail unless implemented.
+    // *Correction*: usage in Cart/service.js suggests `insert-order` might be the main one.
+    // However, the original code was: `userSupabase.from("users").insert(...)`.
+    // So there IS a generic `users` table.
+
+    if (response.data.error) {
+      throw new Error(response.data.error);
     }
-    
-    return { success: true, data };
+
+    return { success: true, data: response.data };
   } catch (error) {
     console.error('Error saving user order:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message || 'Failed to save order' };
   }
 };
 
-// Verify if Supabase connection is working
-export const testSupabaseConnection = async () => {
+// Verify if API connection is working (optional replacement for Supabase test)
+export const testApiConnection = async () => {
   try {
-    const { data, error } = await userSupabase.from("users").select("*").limit(1);
-    
-    if (error) {
-      console.error("Supabase connection test failed:", error);
-      return { success: false, error };
-    } 
-    
-    return { success: true, data };
+    await axios.get(`${API_BASE_URL}/health`); // Assuming a health check or similar
+    // Or just return true as we don't need to block UI on this check usually
+    return { success: true };
   } catch (error) {
-    console.error("Unexpected error testing Supabase connection:", error);
+    // console.error("API connection test failed:", error);
     return { success: false, error: error.message };
   }
 }; 

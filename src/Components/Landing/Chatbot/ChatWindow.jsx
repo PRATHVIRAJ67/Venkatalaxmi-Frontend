@@ -39,12 +39,12 @@ const ChatWindow = () => {
     try {
       // Create a fallback response in case the API call fails
       let botReply = "I'm currently offline but will be back soon!";
-      
+
       try {
         // Send POST request to your backend API
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL|| 'http://localhost:5000/api'}/chat`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/chat`, {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             'Origin': window.location.origin
           },
@@ -62,7 +62,7 @@ const ChatWindow = () => {
       } catch (apiError) {
         console.error("API fetch error:", apiError);
       }
-      
+
       // Create a new bot message with the API response or fallback
       const newBotMessage = {
         id: messages.length + 2,
@@ -119,9 +119,9 @@ const ChatWindow = () => {
         <div ref={messagesEndRef} /> {/* Empty div for scrolling to bottom */}
       </div>
       <div className="chat-footer">
-        <input 
-          type="text" 
-          placeholder="Type your message..." 
+        <input
+          type="text"
+          placeholder="Type your message..."
           value={inputText}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}

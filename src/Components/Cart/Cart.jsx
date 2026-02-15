@@ -9,7 +9,7 @@ import {
   getCart, saveCart, clearCart as clearCartService,
   calculateCartTotal
 } from '../../services/cartService';
-import { getUserData, saveUserData, testSupabaseConnection as testConnection } from '../../services/userService';
+import { getUserData, saveUserData } from '../../services/userService';
 import { getErrorMessage } from '../../services/uiService';
 import {
   PROMO_CODES,
@@ -34,21 +34,17 @@ const CartPage = () => {
   const [formVisible, setFormVisible] = useState(false);
   const [renderKey, setRenderKey] = useState(0); // Force re-render key
   const [userData, setUserData] = useState(null); // Store form data to use after payment success
-  const [supabaseConnectionStatus, setSupabaseConnectionStatus] = useState(null);
+  // const [supabaseConnectionStatus, setSupabaseConnectionStatus] = useState(null); // REMOVED
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null); // null = clear all, string = single item id
 
   // Razorpay payment hook
   const { loading, initiatePayment } = useRazorpay();
 
-  // Test Supabase connection on component mount
+  // Test Connection on component mount (OPTIONAL/REMOVED since main flow uses API now)
   useEffect(() => {
-    const checkConnection = async () => {
-      const result = await testConnection();
-      setSupabaseConnectionStatus(result.success ? 'success' : 'failed');
-    };
-
-    checkConnection();
+    // We can rely on API failure handling during checkout instead of pre-check
+    // Or implement testApiConnection() from userService if strict check needed
 
     // Try to load saved user data if available
     const savedUserData = getUserData();
@@ -230,9 +226,9 @@ const CartPage = () => {
       return;
     }
 
-    if (supabaseConnectionStatus === 'failed') {
-      alert(ERROR_MESSAGES.CONNECTION_ERROR);
-    }
+    // if (supabaseConnectionStatus === 'failed') {
+    //   alert(ERROR_MESSAGES.CONNECTION_ERROR);
+    // }
 
     // Show the form to collect user details
     setFormVisible(true);

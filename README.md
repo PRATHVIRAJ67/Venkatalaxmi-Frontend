@@ -35,14 +35,6 @@ A React-based web application for Venkatalakshmi Mess where customers can browse
 Create a `.env` file in the project root with the following variables:
 
 ```
-# Supabase configuration for menu items
-VITE_SUPABASE_URL=your-menu-supabase-url
-VITE_SUPABASE_KEY=your-menu-supabase-key
-
-# Supabase configuration for user details
-VITE_USER_SUPABASE_URL=your-user-supabase-url
-VITE_USER_SUPABASE_KEY=your-user-supabase-key
-
 # API base URL
 VITE_API_BASE_URL=your-api-base-url
 ```
@@ -56,17 +48,12 @@ VITE_API_BASE_URL=your-api-base-url
 
 ## Database Structure
 
-The application uses two Supabase databases:
+The application relies on a backend API to interact with the database. The frontend does not directly access Supabase.
 
-1. Menu Database: Stores menu items with their details
-   - Table: `menu_items`
-   
-2. User Database: Stores user details and orders
-   - Table: `users`
 
 ## Handling User Data
 
-User data is stored in session storage for the duration of the browser session, providing a balance between user convenience and privacy. After a successful order, the data is sent to the Supabase database for order processing.
+User data is stored in session storage for the duration of the browser session, providing a balance between user convenience and privacy. After a successful order, the data is sent to the backend API for order processing.
 
 ## Contributing
 

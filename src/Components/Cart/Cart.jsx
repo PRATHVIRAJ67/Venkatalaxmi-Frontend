@@ -248,7 +248,7 @@ const CartPage = () => {
 
         {cart.length === 0 ? (
           <div className="empty-cart-message">
-            <i className="bi bi-cart-x"></i>
+            <i className="fas fa-shopping-cart"></i>
             <h3>Your cart is empty</h3>
             <p>Add some delicious items to get started</p>
             <button className="browse-menu-button" onClick={handleContinueShopping}>
@@ -302,7 +302,7 @@ const CartPage = () => {
 
                   <div className="action-col">
                     <button className="remove-item-button" onClick={() => handleRemoveItemClick(item.id)}>
-                      <i className="bi bi-trash"></i>
+                      <i className="fas fa-trash"></i>
                     </button>
                   </div>
                 </div>
@@ -310,7 +310,7 @@ const CartPage = () => {
 
               <div className="cart-actions">
                 <button className="clear-cart-button" onClick={handleClearCartClick}>
-                  <i className="bi bi-x-circle"></i> Clear Cart
+                  <i className="fas fa-times-circle"></i> Clear Cart
                 </button>
               </div>
             </div>
@@ -403,7 +403,7 @@ const CartPage = () => {
                 </div>
                 {isPromoApplied && (
                   <div className="promo-applied-message">
-                    <i className="bi bi-check-circle"></i> {discount}% discount applied
+                    <i className="fas fa-check-circle"></i> {discount}% discount applied
                   </div>
                 )}
               </div>
@@ -419,7 +419,7 @@ const CartPage = () => {
                 disabled={loading}
               >
                 {loading ? "" : "Proceed to Payment"}
-                {!loading && <i className="bi bi-arrow-right"></i>}
+                {!loading && <i className="fas fa-arrow-right"></i>}
               </button>
               <UserFormModal
                 isOpen={formVisible}
@@ -437,7 +437,7 @@ const CartPage = () => {
         <div className="confirm-dialog-overlay" onClick={() => setShowClearConfirm(false)}>
           <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="confirm-dialog-icon">
-              <i className="bi bi-exclamation-triangle"></i>
+              <i className="fas fa-exclamation-triangle"></i>
             </div>
             <h3>{pendingDeleteId ? 'Remove Item?' : 'Clear Cart?'}</h3>
             <p>

@@ -3,27 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import './MenuSection.css';
 
 import { fetchMenuItems } from '../../../services/menuService';
-import { getCurrentDayOfWeek } from '../../OrderPage/menuData';
 
 const MenuSection = () => {
   const [activeTab, setActiveTab] = useState('menu-starters');
   const [menuItemsFromDB, setMenuItemsFromDB] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [itemsPerPage] = useState(6);
+  const [itemsPerPage] = useState(6); // Show 6 items per category on landing
   const navigate = useNavigate();
 
   const menuCategories = [
-    { id: 'menu-starters', title: 'Sweets', icon: 'bi-cup-hot' },
-    { id: 'menu-breakfast', title: 'Breakfast', icon: 'bi-egg-fried' },
-    { id: 'menu-lunch', title: 'Lunch', icon: 'bi-cup-straw' },
-    { id: 'menu-dinner', title: 'Snacks', icon: 'bi-palette' }
+    { id: 'menu-starters', title: 'Sweets', icon: 'fas fa-cookie-bite' },
+    { id: 'menu-breakfast', title: 'Breakfast', icon: 'fas fa-coffee' },
+    { id: 'menu-lunch', title: 'Lunch', icon: 'fas fa-utensils' },
+    { id: 'menu-dinner', title: 'Snacks', icon: 'fas fa-hamburger' }
   ];
 
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
       const { data, error } = await fetchMenuItems();
+      console.log(data);
 
       if (error) {
         console.error('Error fetching menu items:', error);
@@ -34,33 +34,6 @@ const MenuSection = () => {
     };
 
     fetchItems();
-
-    // We removed real-time subscriptions to avoid Supabase usage
-    // Using simple periodic refresh or just refresh on mount is sufficient for now
-
-    // Update at midnight to get new day's menu
-    const setupMidnightRefresh = () => {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(0, 0, 0, 0);
-      const timeUntilMidnight = tomorrow - new Date();
-
-      return setTimeout(() => {
-        // Clear cache at midnight
-        sessionStorage.removeItem('menuItems');
-        sessionStorage.removeItem('menuItemsCachedDay');
-        fetchItems();
-
-        // Setup for the next day
-        setupMidnightRefresh();
-      }, timeUntilMidnight);
-    };
-
-    const midnightTimer = setupMidnightRefresh();
-
-    return () => {
-      clearTimeout(midnightTimer);
-    };
   }, []);
 
   const getMenuItemsByCategory = () => {
@@ -73,118 +46,15 @@ const MenuSection = () => {
 
     if (!menuItemsFromDB.length) return result;
 
-    // Get current day as both string and number
-    const currentDay = getCurrentDayOfWeek(); // Returns string like "Monday"
-    const currentDayNumber = new Date().getDay(); // Returns number 0-6
-
-
-
-    // Create a map of all items by category for fallback
-    const allItemsByCategory = {
-      'menu-starters': [],
-      'menu-breakfast': [],
-      'menu-lunch': [],
-      'menu-dinner': []
-    };
-
-    // First categorize all items
+    // Simply categorize all items — no day filtering needed for landing page preview
     menuItemsFromDB.forEach(item => {
       const categoryId = item.category;
-      if (categoryId && allItemsByCategory[categoryId]) {
-        const formattedPrice = `₹${item.price}`;
-
-        allItemsByCategory[categoryId].push({
-          ...item,
-          price: formattedPrice,
-          img: item.img || item.image_url || "/img/menu/placeholder.jpg"
-        });
-      }
-    });
-
-    // Filter by day
-    menuItemsFromDB.forEach(item => {
-      // Get the category based on the category field
-      const categoryId = item.category;
-
-      // If no valid category, skip
-      if (!categoryId || !result[categoryId]) {
-        return;
-      }
-
-      // Default to being available every day if days is not specified
-      if (!item.days || item.days.length === 0) {
-        const formattedPrice = `₹${item.price}`;
-
+      if (categoryId && result[categoryId]) {
         result[categoryId].push({
           ...item,
-          price: formattedPrice,
+          price: `₹${item.price}`,
           img: item.img || item.image_url || "/img/menu/placeholder.jpg"
         });
-        return;
-      }
-
-      try {
-        let shouldInclude = false;
-
-        // If days is a number
-        if (typeof item.days === 'number') {
-          shouldInclude = item.days === currentDayNumber;
-        }
-        // If days is an array
-        else if (Array.isArray(item.days)) {
-          // Check both numeric days and string days
-          shouldInclude = item.days.includes(currentDayNumber) ||
-            item.days.includes(currentDay) ||
-            item.days.includes(String(currentDayNumber));
-        }
-        // If days is a string, try to parse it
-        else if (typeof item.days === 'string') {
-          try {
-            // Try to parse as JSON first
-            const parsedDays = JSON.parse(item.days);
-            if (Array.isArray(parsedDays)) {
-              shouldInclude = parsedDays.includes(currentDayNumber) ||
-                parsedDays.includes(currentDay) ||
-                parsedDays.includes(String(currentDayNumber));
-            }
-          } catch (e) {
-            // If JSON parsing fails, try comma-separated values
-            const daysArray = item.days.split(',').map(d => d.trim());
-            shouldInclude = daysArray.includes(String(currentDayNumber)) ||
-              daysArray.includes(currentDay) ||
-              daysArray.some(d => parseInt(d) === currentDayNumber);
-          }
-        }
-
-        if (shouldInclude) {
-          const formattedPrice = `₹${item.price}`;
-
-          result[categoryId].push({
-            ...item,
-            price: formattedPrice,
-            img: item.img || item.image_url || "/img/menu/placeholder.jpg"
-          });
-        }
-      } catch (e) {
-        console.error('Error processing days for item:', item.name, e);
-        // Include it anyway if there's an error
-        const formattedPrice = `₹${item.price}`;
-
-        result[categoryId].push({
-          ...item,
-          price: formattedPrice,
-          img: item.img || item.image_url || "/img/menu/placeholder.jpg"
-        });
-      }
-    });
-
-    // Add fallback items if any category is empty
-    Object.keys(result).forEach(category => {
-      if (result[category].length === 0 && allItemsByCategory[category].length > 0) {
-
-        // Add up to 3 items as fallback
-        const itemsToAdd = allItemsByCategory[category].slice(0, 3);
-        result[category].push(...itemsToAdd);
       }
     });
 
@@ -197,111 +67,91 @@ const MenuSection = () => {
     setActiveTab(tabId);
   };
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.AOS) {
-      window.AOS.refresh();
-    }
-  }, [activeTab]);
-
   const handleCardClick = () => {
-    navigate('/order');
+    navigate('/order', { state: { category: activeTab } });
   };
 
-  // Display only limited items for landing page
   const getDisplayItems = (categoryId) => {
     const items = menuItems[categoryId] || [];
-    // Show only the first page items (e.g. 6 items)
     return items.slice(0, itemsPerPage);
   };
 
-  if (isLoading) {
-    return (
-      <section id="menu" className="menu-section">
-        <div className="container section-title" data-aos="fade-up">
-          <h2>Our Menu</h2>
-          <div className="loading-spinner"></div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section id="menu" className="menu-section">
-      <div className="container section-title" data-aos="fade-up">
-        <h2>Our Menu</h2>
-        <p><span>Check Our</span> <span className="description-title">Yummy Menu</span></p>
-      </div>
+      <div className="container" data-aos="fade-up">
 
-      <div className="container">
-        <div className="menu-tcabs-wrapper" data-aos="fade-up" data-aos-delay="100">
-          <ul className="menu-tabs">
-            {menuCategories.map((category) => (
-              <li key={category.id} className="menu-tab-item">
-                <button
-                  className={`menu-tab-button ${activeTab === category.id ? 'active' : ''}`}
-                  onClick={() => handleTabChange(category.id)}
-                >
-                  <i className={`bi ${category.icon}`}></i>
-                  <h4>{category.title}</h4>
-                </button>
-              </li>
-            ))}
-          </ul>
+        <div className="section-header text-center mb-5">
+          <span className="sub-title">Our Menu</span>
+          <h2 className="title">Discover our <span className="text-primary">Delicious Menu</span></h2>
+          <p className="description">Fresh, tasty, and prepared with love. Explore our daily specials.</p>
         </div>
 
-        <div className="menu-content" data-aos="fade-up" data-aos-delay="200">
-          {menuCategories.map((category) => (
-            <div
-              key={category.id}
-              className={`menu-tab-content ${activeTab === category.id ? 'active' : ''}`}
-              id={category.id}
-            >
-              <div className="menu-header">
-                <p>Our Selection</p>
-                <h3>{category.title}</h3>
-              </div>
+        {/* Improved Tabs */}
+        <div className="tabs-wrapper">
+          <div className="menu-tabs">
+            {menuCategories.map((category) => (
+              <button
+                key={category.id}
+                className={`tab-btn ${activeTab === category.id ? 'active' : ''}`}
+                onClick={() => handleTabChange(category.id)}
+              >
+                <div className="icon-box">
+                  <i className={category.icon}></i>
+                </div>
+                <span>{category.title}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
-              <div className="menu-items-grid">
-                {getDisplayItems(category.id).length > 0 ? (
-                  getDisplayItems(category.id).map((item, index) => (
-                    <div className="menu-item" key={item.id || index} onClick={handleCardClick}>
-                      <div className="menu-item-img-container">
+        {/* Menu Grid */}
+        <div className="menu-content mt-4">
+          {isLoading ? (
+            <div className="loading-state">
+              <div className="spinner"></div>
+            </div>
+          ) : (
+            <div className="row g-4 justify-content-center">
+              {getDisplayItems(activeTab).length > 0 ? (
+                getDisplayItems(activeTab).map((item, index) => (
+                  <div key={item.id || index} className="col-lg-3 col-md-4 col-sm-6 animate-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                    <div className="product-card" onClick={handleCardClick}>
+                      <div className="card-image">
                         <img
                           src={item.img || "/img/menu/placeholder.jpg"}
-                          className="menu-img"
                           alt={item.name}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "/img/menu/placeholder.jpg";
-                          }}
-                          loading={index < 3 ? "eager" : "lazy"}
+                          onError={(e) => { e.target.onerror = null; e.target.src = "/img/menu/placeholder.jpg"; }}
                         />
-                        <div className="menu-item-overlay">
-                          <button className="view-button">
-                            <i className="bi bi-eye"></i>
-                          </button>
-                        </div>
+                        <span className="price-tag">{item.price}</span>
                       </div>
-                      <div className="menu-item-info">
-                        <h4>{item.name}</h4>
-                        <p className="ingredients">{item.description}</p>
-                        <p className="price">{item.price}</p>
+                      <div className="card-details">
+                        <h3 className="product-name">{item.name}</h3>
+                        <p className="product-desc">{item.description || "Delicious South Indian delicacy."}</p>
+                        <button className="add-btn">
+                          Add <i className="fas fa-plus ms-1"></i>
+                        </button>
                       </div>
-                      <button className="buy-now-button" onClick={handleCardClick}>
-                        Buy Now
-                      </button>
                     </div>
-                  ))
-                ) : (
-                  <div className="no-items-message">
-                    <p>No items available for this category today.</p>
                   </div>
-                )}
-              </div>
-
+                ))
+              ) : (
+                <div className="col-12 text-center py-5">
+                  <div className="empty-state">
+                    <i className="fas fa-utensils mb-3"></i>
+                    <p>No items available in this category today.</p>
+                  </div>
+                </div>
+              )}
             </div>
-          ))}
+          )}
         </div>
+
+        <div className="text-center mt-5">
+          <button className="btn-view-all" onClick={() => navigate('/order', { state: { category: activeTab } })}>
+            View Full Menu <i className="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+
       </div>
     </section>
   );

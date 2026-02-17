@@ -68,17 +68,17 @@ const testimonialData = [
 
 const Testimonials = () => {
   useEffect(() => {
-    AOS.init({ 
+    AOS.init({
       once: true,
       duration: 800,
       easing: 'ease-in-out'
     });
   }, []);
 
-  
+
   const renderStars = (count) => {
     return Array(count).fill(0).map((_, index) => (
-      <i key={index} className="bi bi-star-fill" aria-hidden="true"></i>
+      <i key={index} className="fas fa-star" aria-hidden="true"></i>
     ));
   };
 
@@ -96,13 +96,13 @@ const Testimonials = () => {
           modules={[Pagination, Autoplay, A11y]}
           loop={true}
           speed={800}
-          autoplay={{ 
+          autoplay={{
             delay: 5000,
             disableOnInteraction: false
           }}
           slidesPerView={1}
           spaceBetween={30}
-          pagination={{ 
+          pagination={{
             clickable: true,
             dynamicBullets: true
           }}
@@ -118,9 +118,9 @@ const Testimonials = () => {
                 <div className="testimonial-wrapper">
                   <div className="testimonial-content">
                     <div className="quote-content">
-                      <i className="bi bi-quote quote-icon-left" aria-hidden="true"></i>
+                      <i className="fas fa-quote-left quote-icon-left" aria-hidden="true"></i>
                       <span>{testimonial.content}</span>
-                      <i className="bi bi-quote quote-icon-right" aria-hidden="true"></i>
+                      <i className="fas fa-quote-right quote-icon-right" aria-hidden="true"></i>
                     </div>
                     <div className="author-info">
                       <h3>{testimonial.name}</h3>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import './OrderPage.css';
 import { AiOutlinePlus, AiOutlineMinus, AiOutlineArrowLeft } from 'react-icons/ai';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,10 +14,10 @@ import ChatBotIcon from '../Landing/Chatbot/ChatBotIcon';
 
 // Menu categories with their icons
 const menuCategories = [
-  { id: 'menu-starters', title: 'Sweets', icon: 'bi-cake2-fill' },
-  { id: 'menu-breakfast', title: 'Breakfast', icon: 'bi-cup-hot-fill' },
-  { id: 'menu-lunch', title: 'Lunch', icon: 'bi-egg-fried' },
-  { id: 'menu-dinner', title: 'Snacks', icon: 'bi-basket3-fill' }
+  { id: 'menu-starters', title: 'Sweets', icon: 'fas fa-birthday-cake' },
+  { id: 'menu-breakfast', title: 'Breakfast', icon: 'fas fa-mug-hot' },
+  { id: 'menu-lunch', title: 'Lunch', icon: 'fas fa-egg' },
+  { id: 'menu-dinner', title: 'Snacks', icon: 'fas fa-shopping-basket' }
 ];
 
 // Helper functions
@@ -75,7 +75,9 @@ const OrderPage = () => {
   useSEO('ORDER');
 
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('menu-starters');
+  const location = useLocation();
+  const initialCategory = location.state?.category || 'menu-starters';
+  const [activeTab, setActiveTab] = useState(initialCategory);
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -276,7 +278,7 @@ const OrderPage = () => {
       // Show a message that this category is not available now
       const notification = document.getElementById('cart-notification');
       if (notification) {
-        notification.innerHTML = `<i class="bi bi-x-circle"></i> This menu is not available now`;
+        notification.innerHTML = `<i class="fas fa-times-circle"></i> This menu is not available now`;
         notification.classList.add('show');
         setTimeout(() => {
           notification.classList.remove('show');
@@ -572,7 +574,7 @@ const OrderPage = () => {
   return (
     <div className="order-page">
       <div id="cart-notification" className="cart-notification">
-        <i className="bi bi-check-circle"></i> Item added to cart
+        <i className="fas fa-check-circle"></i> Item added to cart
       </div>
 
       {/* Desktop Cart Button */}
@@ -588,11 +590,11 @@ const OrderPage = () => {
         }}>
         <Link to="/cart" className="cart-view-wrapper">
           <div className="cart-toggle">
-            <i className="bi bi-cart-fill cart-icon-bootstrap"></i>
+            <i className="fas fa-shopping-cart cart-icon-bootstrap"></i>
             {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
           </div>
           <div className="view-cart-link">
-            <i className="bi bi-bag-fill"></i> View Cart
+            <i className="fas fa-shopping-bag"></i> View Cart
           </div>
         </Link>
       </div>
@@ -600,7 +602,7 @@ const OrderPage = () => {
       {/* Mobile Cart Button (circular) */}
       <Link to="/cart" className="mobile-cart-button mobile-only">
         <div className="mobile-cart-icon">
-          <i className="bi bi-cart-fill"></i>
+          <i className="fas fa-shopping-cart"></i>
           {cart.length > 0 && <span className="mobile-cart-badge">{cart.length}</span>}
         </div>
         <span className="mobile-cart-text">View Cart</span>
@@ -609,7 +611,7 @@ const OrderPage = () => {
       <div className="container">
         <div className="order-header">
           <Link to="/" className="back-button" title="Back to menu">
-            <i className="bi bi-arrow-left-circle-fill"></i> Back
+            <i className="fas fa-arrow-circle-left"></i> Back
           </Link>
           <h1>Order Your Food</h1>
           <div className="spacer"></div>
@@ -626,7 +628,7 @@ const OrderPage = () => {
                     onClick={() => handleTabChange(category.id)}
                     disabled={!isAvailable}
                   >
-                    <i className={`bi ${category.icon}`}></i>
+                    <i className={`${category.icon}`}></i>
                     <h4>{category.title}</h4>
                     {!isAvailable && (
                       <span className="lock-icon">
@@ -663,7 +665,7 @@ const OrderPage = () => {
                   )} */}
                   {!availableCategories.includes(category.id) && (
                     <div className="menu-unavailable-message">
-                      <i className="bi bi-clock"></i> This menu is not available at this time
+                      <i className="fas fa-clock"></i> This menu is not available at this time
                     </div>
                   )}
                 </div>
@@ -740,7 +742,7 @@ const OrderPage = () => {
                                               title="Enter quantity manually"
                                               aria-label="Edit quantity manually"
                                             >
-                                              <i className="bi bi-pencil"></i>
+                                              <i className="fas fa-pencil-alt"></i>
                                               <span> Enter quantity manually</span>
                                             </button>
                                           )}
@@ -761,7 +763,7 @@ const OrderPage = () => {
                                       onClick={() => addToCart(item, category.id)}
                                       aria-label={isSweetsCategory ? 'Add 50 pieces to cart' : (category.id === 'menu-dinner' ? 'Add 10 packs to cart' : 'Add to cart')}
                                     >
-                                      <i className="bi bi-cart-plus-fill"></i> {isSweetsCategory ? 'Add 50 pieces' : (category.id === 'menu-dinner' ? 'Add 10 pack' : 'Add to Cart')}
+                                      <i className="fas fa-cart-plus"></i> {isSweetsCategory ? 'Add 50 pieces' : (category.id === 'menu-dinner' ? 'Add 10 pack' : 'Add to Cart')}
                                     </button>
                                   )}
                                 </div>
@@ -784,7 +786,7 @@ const OrderPage = () => {
                           disabled={currentPage === 1}
                           className="pagination-arrow"
                         >
-                          <i className="bi bi-chevron-left"></i>
+                          <i className="fas fa-chevron-left"></i>
                         </button>
 
                         <div className="pagination-numbers">
@@ -804,7 +806,7 @@ const OrderPage = () => {
                           disabled={currentPage === totalPagesFromServer}
                           className="pagination-arrow"
                         >
-                          <i className="bi bi-chevron-right"></i>
+                          <i className="fas fa-chevron-right"></i>
                         </button>
                       </div>
                     )}
@@ -812,7 +814,7 @@ const OrderPage = () => {
                 ) : (
                   <div className="locked-menu-content">
                     <div className="locked-menu-message">
-                      <i className="bi bi-lock-fill"></i>
+                      <i className="fas fa-lock"></i>
                       <h3>This menu is currently unavailable</h3>
                       <p>Please check back during the appropriate hours:</p>
                       <ul>

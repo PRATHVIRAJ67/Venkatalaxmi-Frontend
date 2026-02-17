@@ -1,16 +1,16 @@
 // Menu categories
 export const MENU_CATEGORIES = [
-  { id: 'menu-starters', title: 'Sweets', icon: 'bi-cake2-fill' },
-  { id: 'menu-breakfast', title: 'Breakfast', icon: 'bi-cup-hot-fill' },
-  { id: 'menu-lunch', title: 'Lunch', icon: 'bi-egg-fried' },
-  { id: 'menu-dinner', title: 'Snacks', icon: 'bi-basket3-fill' }
+  { id: 'menu-starters', title: 'Sweets', icon: 'fas fa-birthday-cake' },
+  { id: 'menu-breakfast', title: 'Breakfast', icon: 'fas fa-mug-hot' },
+  { id: 'menu-lunch', title: 'Lunch', icon: 'fas fa-egg' },
+  { id: 'menu-dinner', title: 'Snacks', icon: 'fas fa-shopping-basket' }
 ];
 
 // Promo codes with their discount percentages
 export const PROMO_CODES = {
   'WELCOME10': 50,
   'SPECIAL25': 25,
-  'FREESHIP': 100  
+  'FREESHIP': 100
 };
 
 // Default delivery fee

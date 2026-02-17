@@ -6,28 +6,28 @@ import './Contact.css';
 const contactInfo = [
   {
     id: 'address',
-    icon: 'bi-geo-alt',
+    icon: 'fas fa-map-marker-alt',
     title: 'Address',
     content: 'Beside venkatalaxmi Kalyana Mantapa',
     delay: 100
   },
   {
     id: 'phone',
-    icon: 'bi-telephone',
+    icon: 'fas fa-phone',
     title: 'Call Us',
     content: '9008057055   ,7022197488',
     delay: 150
   },
   {
     id: 'email',
-    icon: 'bi-envelope',
+    icon: 'fas fa-envelope',
     title: 'Email Us',
     content: 'ananthapadmanabhaaithal@gmail.com ',
     delay: 200
   },
   {
     id: 'hours',
-    icon: 'bi-clock',
+    icon: 'fas fa-clock',
     title: 'Opening Hours',
     content: <><strong>Mon-Sun:</strong> 8AM - 7PM </>,
     delay: 250
@@ -41,7 +41,7 @@ const Contact = () => {
     subject: '',
     message: ''
   });
-  const [formStatus, setFormStatus] = useState('idle'); 
+  const [formStatus, setFormStatus] = useState('idle');
   const [errors, setErrors] = useState({});
   const formRef = useRef(null);
   const [animationsInitialized, setAnimationsInitialized] = useState(false);
@@ -108,7 +108,7 @@ const Contact = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -117,16 +117,16 @@ const Contact = () => {
     }
     if (!formData.subject.trim()) newErrors.subject = 'Subject is required';
     if (!formData.message.trim()) newErrors.message = 'Message is required';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setFormStatus('loading');
 
     // Simulate form submission
@@ -166,15 +166,15 @@ const Contact = () => {
         {/* Contact Info Cards - Reduced padding */}
         <div className="info-cards">
           {contactInfo.map(item => (
-            <div 
-              className="info-card" 
-              key={item.id} 
-              data-aos="fade-up" 
+            <div
+              className="info-card"
+              key={item.id}
+              data-aos="fade-up"
               data-aos-offset="10"
               data-aos-delay={item.delay}
             >
               <div className="info-icon">
-                <i className={`bi ${item.icon}`} aria-hidden="true"></i>
+                <i className={`${item.icon}`} aria-hidden="true"></i>
               </div>
               <div className="info-content">
                 <h3>{item.title}</h3>
@@ -183,7 +183,7 @@ const Contact = () => {
             </div>
           ))}
         </div>
-        
+
         {/* Form with reduced padding */}
         <form
           ref={formRef}
@@ -260,23 +260,23 @@ const Contact = () => {
                   <div className="spinner"></div>
                 </div>
               )}
-              
+
               {formStatus === 'error' && (
                 <div className="form-status error">
-                  <i className="bi bi-exclamation-circle"></i>
+                  <i className="fas fa-exclamation-circle"></i>
                   <span>There was an error. Please try again.</span>
                 </div>
               )}
-              
+
               {formStatus === 'sent' && (
                 <div className="form-status success">
-                  <i className="bi bi-check-circle"></i>
+                  <i className="fas fa-check-circle"></i>
                   <span>Your message has been sent. Thank you!</span>
                 </div>
               )}
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 disabled={formStatus === 'loading'}
                 className="submit-button"
               >

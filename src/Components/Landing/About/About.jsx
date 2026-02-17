@@ -27,28 +27,28 @@ const About = () => {
               <p className="intro-text">
                 Venkatalaxmi Mess offers fresh, homely, and hygienic food at affordable prices, perfect for locals, tourists, and working professionals. Every meal is prepared with care using fresh ingredients and traditional recipes, ensuring a warm and authentic home-cooked experience.
               </p>
-              
+
               <ul className="feature-list">
                 <li className="feature-item">
-                  <i className="bi bi-check-circle-fill"></i>
+                  <i className="fas fa-check-circle"></i>
                   <span>Fresh, homely, and hygienic food at affordable prices</span>
                 </li>
                 <li className="feature-item">
-                  <i className="bi bi-check-circle-fill"></i>
+                  <i className="fas fa-check-circle"></i>
                   <span>Perfect for locals, tourists, and working professionals</span>
                 </li>
                 <li className="feature-item">
-                  <i className="bi bi-check-circle-fill"></i>
+                  <i className="fas fa-check-circle"></i>
                   <span>
                     Every meal prepared with care, using fresh ingredients and traditional recipes
                   </span>
                 </li>
               </ul>
-              
+
               <p className="description-text">
-                With a focus on taste, hygiene, and affordability, we prepare every meal with care, 
-                using fresh ingredients and traditional recipes. Whether you're craving a wholesome lunch 
-                or a simple, satisfying dinner, Venkatalaxmi Mess is here to serve you with the warmth 
+                With a focus on taste, hygiene, and affordability, we prepare every meal with care,
+                using fresh ingredients and traditional recipes. Whether you're craving a wholesome lunch
+                or a simple, satisfying dinner, Venkatalaxmi Mess is here to serve you with the warmth
                 and authenticity of home-cooked food.
               </p>
 

@@ -1,87 +1,86 @@
 import React, { useEffect, useState } from 'react';
 import './Main.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Link } from "react-router-dom";
 
 const Main = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const handleScroll = () => {
-    const scrollElements = document.querySelectorAll('.scroll-animation');
-    scrollElements.forEach(element => {
-      const elementPosition = element.getBoundingClientRect().top;
-      const windowHeight = window.innerHeight;
-      if (elementPosition < windowHeight - 100) {
-        element.classList.add('visible');
-      }
-    });
-  };
-
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('scroll', handleScroll);
-    };
+    setIsLoaded(true);
   }, []);
 
   return (
     <main className="main">
-      <section id="hero" className="hero section">
+      <section id="hero" className="hero-section">
         <div className="container">
-          <div className="row gy-4 justify-content-between align-items-center">
-            <div className="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center hero-content">
-              <h1 className={`scroll-animation ${isLoaded ? 'visible' : ''}`} data-delay="0">
-                Welcome to <br />Venkatalakshmi Mess
-              </h1>
-              <p className={`scroll-animation ${isLoaded ? 'visible' : ''}`} data-delay="200">
-             We Offer  unlimited, home-cooked breakfast and lunch at unbeatable prices. Enjoy hygienic, tasty, and wholesome meals every day!
-              </p>
-              <div className={`hero-buttons scroll-animation ${isLoaded ? 'visible' : ''}`} data-delay="400">
-                <Link to="/order" className="btn-get-started">
-                  Book Now
-                </Link>
-                <a href="#about" className="btn-discover">
-                  <span>Discover More</span>
-                  <i className="fas fa-long-arrow-alt-right"></i>
-                </a>
-              </div>
-              <div className={`hero-features scroll-animation ${isLoaded ? 'visible' : ''}`} data-delay="600">
-                <div className="feature">
-                  <i className="fas fa-leaf"></i>
-                  <span>Fresh Ingredients</span>
+          <div className="row align-items-center gy-5">
+
+            <div className="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center text-center text-lg-start">
+              <div className={`hero-content ${isLoaded ? 'animate-fade-up' : ''}`}>
+                <span className="badge-highlight">
+                  <i className="fas fa-star me-2"></i> #1 Food in Kundapura
+                </span>
+                <h1 className="hero-title">
+                  Taste the <span className="text-gradient">Tradition</span> of <br />
+                  Home Cooking
+                </h1>
+                <p className="hero-subtitle">
+                  Authentic South Indian meals, fresh ingredients, and the warmth of home.
+                  Experience the best vegetarian cuisine in town.
+                </p>
+
+                <div className="hero-actions d-flex flex-column flex-sm-row align-items-center gap-3 justify-content-center justify-content-lg-start">
+                  <Link to="/order" className="btn-primary-lg">
+                    Order Now <i className="fas fa-arrow-right ms-2"></i>
+                  </Link>
+                  <a href="#menu" className="btn-secondary-lg">
+                    View Menu
+                  </a>
                 </div>
-                <div className="feature">
-                  <i className="fas fa-utensils"></i>
-                  <span>Expert Chefs</span>
-                </div>
-                <div className="feature">
-                  <i className="fas fa-award"></i>
-                  <span>15+ Years of Trust</span>
+
+                <div className="hero-stats d-flex gap-4 justify-content-center justify-content-lg-start mt-4 pt-2">
+                  <div className="stat-item">
+                    <span className="stat-number">15+</span>
+                    <span className="stat-label">Years of<br />Service</span>
+                  </div>
+                  <div className="stat-divider"></div>
+                  <div className="stat-item">
+                    <span className="stat-number">4.8</span>
+                    <span className="stat-label">Customer<br />Rating</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className={`col-lg-6 order-1 order-lg-2 hero-img scroll-animation ${isLoaded ? 'visible' : ''}`} data-delay="200">
-              <div className="img-container">
+
+            <div className="col-lg-6 order-1 order-lg-2 hero-img text-center">
+              <div className={`image-wrapper ${isLoaded ? 'animate-scale-in' : ''}`}>
+                <div className="blob-bg"></div>
                 <img
                   src="https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Main%20Photo%20starting%2Fmain.jpg?alt=media&token=ba8fb2e4-ac84-4449-bcee-a573884634ca"
-                  className="img-fluid animated"
-                  alt="Traditional South Indian Meal"
+                  className="img-fluid main-img"
+                  alt="Delicious South Indian Meal"
                   loading="eager"
                 />
-              </div>
-              <div className="experience-badge">
-                <span className="number">15+</span>
-                <span className="text">Years of Experience</span>
+
+                {/* Floating Card Element */}
+                <div className="floating-card card-1">
+                  <i className="fas fa-motorcycle icon-bg"></i>
+                  <div className="card-content">
+                    <span className="card-title">Fast Delivery</span>
+                    <span className="card-sub">Within 30 mins</span>
+                  </div>
+                </div>
+
+                <div className="floating-card card-2">
+                  <i className="fas fa-leaf icon-bg-green"></i>
+                  <div className="card-content">
+                    <span className="card-title">100% Veg</span>
+                    <span className="card-sub">Pure & Fresh</span>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>

@@ -14,12 +14,13 @@ export default defineConfig({
     allowedHosts: ['alien-exotic-marmoset.ngrok-free.app'],
     // Add history API fallback for SPA routing
     historyApiFallback: true,
+    host: true,
     proxy: {
       '/sitemap.xml': {
         bypass: (req, res) => {
-          const handler = sitemapViteHandler({ 
-            baseUrl: 'https://www.venkatalaxmimess.in/', 
-            staticPages: ['/', '/order', '/cart', '/contact', '/about'] 
+          const handler = sitemapViteHandler({
+            baseUrl: 'https://www.venkatalaxmimess.in/',
+            staticPages: ['/', '/order', '/cart', '/contact', '/about']
           });
           return handler(req, res);
         }
@@ -40,7 +41,7 @@ export default defineConfig({
             if (id.includes('swiper') || id.includes('aos')) return 'animation-vendor';
             return 'vendor'; // all other packages
           }
-          
+
           // Split app components logically
           if (id.includes('/Components/Landing/')) return 'landing';
           if (id.includes('/Components/OrderPage/')) return 'order';

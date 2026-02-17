@@ -25,36 +25,28 @@ const Header = () => {
   };
 
   return (
-    <header id="header" className={`header d-flex align-items-center sticky-top ${isScrolled ? 'scrolled' : ''}`}>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-      <div className="container position-relative d-flex align-items-center justify-content-between">
+    <header id="header" className={`header ${isScrolled ? 'scrolled' : ''}`}>
+      <div className="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-        <a href="index.html" className="logo d-flex align-items-center me-auto me-xl-0">
-          <img src="/Venkatalakshmi-Logo.png" alt="Venkatalakshmi Logo" />
+        <a href="/" className="logo d-flex align-items-center">
+          {/* Use logo image or text if image fails to load */}
+          <img src="/Venkatalakshmi-Logo.png" alt="Venkatalakshmi Mess" className="img-fluid" />
+          <span className="d-none d-lg-block ms-2">Venkatalakshmi Mess</span>
         </a>
 
-        <nav id="navmenu" className={`navmenu ${isMobileNavActive ? 'mobile-nav-active' : ''}`}>
+        <nav id="navbar" className={`navbar ${isMobileNavActive ? 'navbar-mobile' : ''}`}>
           <ul>
-            {['Home', 'about', 'menu', 'gallery', 'contact'].map((id) => (
-              <li key={id}>
-                <a href={`#${id}`} onClick={closeMobileNav}>
-                  {id.charAt(0).toUpperCase() + id.slice(1)}
-                </a>
-              </li>
-            ))}
+            <li><a className="nav-link scrollto active" href="#hero" onClick={closeMobileNav}>Home</a></li>
+            <li><a className="nav-link scrollto" href="#about" onClick={closeMobileNav}>About</a></li>
+            <li><a className="nav-link scrollto" href="#menu" onClick={closeMobileNav}>Menu</a></li>
+            <li><a className="nav-link scrollto" href="#gallery" onClick={closeMobileNav}>Gallery</a></li>
+            <li><a className="nav-link scrollto" href="#contact" onClick={closeMobileNav}>Contact</a></li>
+            <li><a className="getstarted scrollto" href="/order">Order Now</a></li>
           </ul>
-
-          <button
-            className="mobile-nav-toggle"
-            onClick={toggleMobileNav}
-            aria-label="Toggle mobile navigation"
-            type="button"
-          >
-            <i
-              className={`bi ${isMobileNavActive ? 'bi-x' : 'bi-list'}`}
-            ></i>
-          </button>
         </nav>
+
+        <i className={`mobile-nav-toggle ${isMobileNavActive ? 'fas fa-times' : 'fas fa-bars'}`} onClick={toggleMobileNav}></i>
+
       </div>
     </header>
   );

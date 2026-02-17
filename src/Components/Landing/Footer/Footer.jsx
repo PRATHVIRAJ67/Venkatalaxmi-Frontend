@@ -1,170 +1,104 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import './Footer.css';
 
 function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <div className="container-fluid p-0">
-      {/* Footer */}
-      <footer
-        className="text-center text-lg-start text-white"
-        style={{ backgroundColor: "#2b2b2b" }}
-      >
-        {/* Grid container */}
-        <div className="container p-4 pb-0">
-          {/* Section: Links */}
-          <section>
-            {/*Grid row*/}
-            <div className="row">
-              {/* Grid column - About */}
-              <div className="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h6 className="text-uppercase mb-4 font-weight-bold">
-                  Venkatalaxmi Mess
-                </h6>
-                <p>
-                  Serving fresh, homely, and hygienic food at affordable prices. 
-                  Perfect for locals, tourists, and working professionals looking 
-                  for authentic home-cooked meals.
-                </p>
-                <div className="mt-3">
-                  <img 
-                    src="/img/Venkatalakshmi-Logo.png" 
-                    alt="Venkatalaxmi-Logo" 
-                    style={{ maxWidth: '150px' }} 
-                  />
+    <footer className="footer-section">
+      <div className="container">
+        <div className="footer-content pt-5 pb-5">
+          <div className="row">
+
+            <div className="col-xl-4 col-lg-4 mb-50">
+              <div className="footer-widget">
+                <div className="footer-text">
+                  <p>Serving authentic South Indian cuisine with love and tradition.
+                    Experience the taste of home in every bite.</p>
+                </div>
+                <div className="footer-social-icon form-group mt-3">
+                  <span>Follow us</span>
+                  <a href="#" aria-label="Facebook"><i className="fab fa-facebook-f facebook-bg"></i></a>
+                  <a href="#" aria-label="Twitter"><i className="fab fa-twitter twitter-bg"></i></a>
+                  <a href="#" aria-label="Instagram"><i className="fab fa-instagram instagram-bg"></i></a>
                 </div>
               </div>
-              {/* Grid column */}
-
-              <hr className="w-100 clearfix d-md-none" />
-
-              {/* Grid column - Menu */}
-              <div className="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-                <h6 className="text-uppercase mb-4 font-weight-bold">Menu</h6>
-                <p>
-                  <a className="text-white text-decoration-none" href="#menu">Daily Specials</a>
-                </p>
-                <p>
-                  <a className="text-white text-decoration-none" href="#menu">Lunch Packages</a>
-                </p>
-                <p>
-                  <a className="text-white text-decoration-none" href="#menu">Dinner Meals</a>
-                </p>
-                <p>
-                  <a className="text-white text-decoration-none" href="#menu">Traditional Items</a>
-                </p>
-              </div>
-              {/* Grid column */}
-
-              <hr className="w-100 clearfix d-md-none" />
-
-              {/* Grid column - Quick Links */}
-              <div className="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
-                <h6 className="text-uppercase mb-4 font-weight-bold">
-                  Quick Links
-                </h6>
-                <p>
-                  <a className="text-white text-decoration-none" href="#hero">Home</a>
-                </p>
-                <p>
-                  <a className="text-white text-decoration-none" href="#about">About Us</a>
-                </p>
-                <p>
-                  <a className="text-white text-decoration-none" href="#gallery">Gallery</a>
-                </p>
-                <p>
-                  <a className="text-white text-decoration-none" href="#contact">Contact</a>
-                </p>
-              </div>
-
-              {/* Grid column */}
-              <hr className="w-100 clearfix d-md-none" />
-
-              {/* Grid column - Contact */}
-              <div className="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h6 className="text-uppercase mb-4 font-weight-bold">Contact</h6>
-                <p><i className="fas fa-home mr-3"></i> Beside venkatalaxmi Kalyana Mantapa-Hanglur-576217</p>
-                <p><i className="fas fa-envelope mr-3"></i> ananthapadmanabhaaithal@gmail.com</p>
-                <p><i className="fas fa-phone mr-3"></i> +91 9008057055</p>
-                <p><i className="fas fa-clock mr-3"></i> Mon-Sun: 8AM - 7PM</p>
-              </div>
-              {/* Grid column */}
             </div>
-            {/*Grid row*/}
-          </section>
-          {/* Section: Links */}
 
-          <hr className="my-3" />
-
-          {/* Section: Copyright and Social Media */}
-          <section className="p-3 pt-0">
-            <div className="row d-flex align-items-center">
-              {/* Grid column - Copyright */}
-              <div className="col-md-7 col-lg-8 text-center text-md-start">
-                {/* Copyright */}
-                <div className="p-3">
-                  © {new Date().getFullYear()} Copyright:
-                  <a className="text-white ms-2" href="#">
-                    Venkatalaxmi Mess
-                  </a>
+            <div className="col-xl-4 col-lg-4 col-md-6 mb-30">
+              <div className="footer-widget">
+                <div className="footer-widget-heading">
+                  <h3>Quick Links</h3>
                 </div>
-                {/* Copyright */}
+                <ul>
+                  <li><a href="#hero">Home</a></li>
+                  <li><a href="#about">About Us</a></li>
+                  <li><a href="#menu">Menu</a></li>
+                  <li><a href="#gallery">Gallery</a></li>
+                  <li><a href="/order">Order Now</a></li>
+                  <li><a href="#contact">Contact</a></li>
+                </ul>
               </div>
-              {/* Grid column */}
-
-              {/* Grid column - Social Media */}
-              <div className="col-md-5 col-lg-4 ml-lg-0 text-center text-md-end">
-                {/* Facebook */}
-                <a
-                  className="btn btn-outline-light btn-floating m-1"
-                  role="button"
-                  href="#!"
-                  aria-label="Facebook"
-                >
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-
-                {/* Instagram */}
-                <a
-                  className="btn btn-outline-light btn-floating m-1"
-                  role="button"
-                  href="#!"
-                  aria-label="Instagram"
-                >
-                  <i className="fab fa-instagram"></i>
-                </a>
-
-                {/* WhatsApp */}
-                <a
-                  className="btn btn-outline-light btn-floating m-1"
-                  role="button"
-                  href="https://wa.me/9008057055"
-                  aria-label="WhatsApp"
-                >
-                  <i className="fab fa-whatsapp"></i>
-                </a>
-
-                {/* Google Maps */}
-                <a
-                  className="btn btn-outline-light btn-floating m-1"
-                  role="button"
-                  href="https://maps.app.goo.gl/3dZs9c8b5QTRQs8i6"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Location on Google Maps"
-                >
-                  <i className="fas fa-map-marker-alt"></i>
-                </a>
-              </div>
-              {/* Grid column */}
             </div>
-          </section>
-          {/* Section: Copyright */}
+
+            <div className="col-xl-4 col-lg-4 col-md-6 mb-50">
+              <div className="footer-widget">
+                <div className="footer-widget-heading">
+                  <h3>Contact Info</h3>
+                </div>
+                <div className="footer-contact-info">
+                  <div className="single-contact">
+                    <i className="fas fa-map-marker-alt"></i>
+                    <div className="contact-text">
+                      <h4>Find us</h4>
+                      <p>Beside Venkatalaxmi Kalyana Mantapa, Hanglur - 576217</p>
+                    </div>
+                  </div>
+                  <div className="single-contact">
+                    <i className="fas fa-phone"></i>
+                    <div className="contact-text">
+                      <h4>Call us</h4>
+                      <p>+91 9008057055</p>
+                    </div>
+                  </div>
+                  <div className="single-contact">
+                    <i className="far fa-envelope"></i>
+                    <div className="contact-text">
+                      <h4>Mail us</h4>
+                      <p>ananthapadmanabhaaithal@gmail.com</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-        {/* Grid container */}
-      </footer>
-      {/* Footer */}
-    </div>
+      </div>
+
+      <div className="copyright-area">
+        <div className="container">
+          <div className="row">
+            <div className="col-xl-6 col-lg-6 text-center text-lg-start">
+              <div className="copyright-text">
+                <p>Copyright &copy; {currentYear}, All Right Reserved <a href="/">Venkatalakshmi Mess</a></p>
+              </div>
+            </div>
+            <div className="col-xl-6 col-lg-6 d-none d-lg-block text-right">
+              <div className="footer-menu">
+                <ul>
+                  <li><a href="#">Home</a></li>
+                  <li><a href="#">Terms</a></li>
+                  <li><a href="#">Privacy</a></li>
+                  <li><a href="#">Policy</a></li>
+                  <li><a href="#">Contact</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
 

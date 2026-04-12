@@ -49,16 +49,20 @@ const Gallery = () => {
           pagination={{ clickable: true }}
           breakpoints={{
             320: {
-              slidesPerView: 1,
-              spaceBetween: 0,
+              slidesPerView: 1.2,
+              spaceBetween: 15,
+            },
+            576: {
+              slidesPerView: 2,
+              spaceBetween: 20,
             },
             768: {
               slidesPerView: 3,
-              spaceBetween: 20,
+              spaceBetween: 30,
             },
             1200: {
-              slidesPerView: 5,
-              spaceBetween: 20,
+              slidesPerView: 4,
+              spaceBetween: 40,
             },
           }}
           className="gallery-swiper"

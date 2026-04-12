@@ -8,18 +8,17 @@ import 'swiper/css/pagination';
 import './Gallery.css';
 
 const galleryImages = [
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2FWhatsApp%20Image%202025-05-18%20at%2013.08.27_16ef641e.jpg?alt=media&token=d388cc51-d3ec-477c-9e13-deeb933656e0',
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2F2.png?alt=media&token=6b96b69e-6096-4fc7-87b3-1f13756dd5f8',
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2FWhatsApp%20Image%202025-05-18%20at%2013.08.27_e5cebc4e.jpg?alt=media&token=354ca1a0-f10f-443b-ad87-ade7c12d8b8c',
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2F5.png?alt=media&token=e6e0b084-2795-4fe0-b35c-f2155261d02e',
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2FWhatsApp%20Image%202025-05-18%20at%2013.08.27_16ef641e.jpg?alt=media&token=d388cc51-d3ec-477c-9e13-deeb933656e0',
-    
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2F2.png?alt=media&token=6b96b69e-6096-4fc7-87b3-1f13756dd5f8',
-    'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2FWhatsApp%20Image%202025-05-18%20at%2013.08.27_16ef641e.jpg?alt=media&token=d388cc51-d3ec-477c-9e13-deeb933656e0',
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2FWhatsApp%20Image%202025-05-18%20at%2013.08.27_e5cebc4e.jpg?alt=media&token=354ca1a0-f10f-443b-ad87-ade7c12d8b8c',
-  'https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Gallery%2F5.png?alt=media&token=e6e0b084-2795-4fe0-b35c-f2155261d02e',
-
- 
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/v1775977454/Screenshot_2026-04-12_122808_dlnvje.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/v1775977435/Screenshot_2026-04-12_122714_xnxhym.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/v1775977657/Screenshot_2026-04-12_122932_zlt6qy.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977657/Screenshot_2026-04-12_123125_wpi3ip.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977657/Screenshot_2026-04-12_123019_afhrev.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977657/Screenshot_2026-04-12_122946_tinhnd.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977657/Screenshot_2026-04-12_122959_o5eqtz.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977657/Screenshot_2026-04-12_122909_f9hdp6.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977656/Screenshot_2026-04-12_123051_bns9ok.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977656/Screenshot_2026-04-12_122834_kfsqws.png',
+  'https://res.cloudinary.com/dgslgpo8u/image/upload/q_auto/f_auto/v1775977655/Screenshot_2026-04-12_122822_mannvz.png',
 ];
 
 const Gallery = () => {
@@ -29,7 +28,7 @@ const Gallery = () => {
 
   return (
     <section id="gallery" className="gallery section light-background">
-      
+
       <div className="container section-title" data-aos="fade-up">
         <h2>Gallery</h2>
         <p>
@@ -38,7 +37,7 @@ const Gallery = () => {
         </p>
       </div>
 
-      
+
       <div className="container" data-aos="fade-up" data-aos-delay="100">
         <Swiper
           modules={[Autoplay, Pagination]}

@@ -144,21 +144,19 @@
   background-position: center;
   background-size: contain;
   z-index: -1;
-  opacity: 0.8;
+  opacity: 0.5;
 }
 
 .main-img {
-  border-radius: 30px;
-  /* More rounded */
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18);
   max-width: 100%;
-  width: 450px;
-  /* Fixed width for consistency */
-  border: 8px solid #fff;
+  width: 480px;
+  border: none;
   position: relative;
   z-index: 2;
-  /* Rotate slightly for dynamic feel */
-  transform: rotate(-3deg);
+  transform: none;
+  object-fit: cover;
 }
 
 /* Floating Cards */
@@ -286,9 +284,10 @@
   }
 
   .main-img {
-    margin-top: 50px;
-    width: 80%;
-    transform: rotate(0);
+    margin-top: 30px;
+    width: 85%;
+    border-radius: 20px;
+    transform: none;
   }
 
   .floating-card {

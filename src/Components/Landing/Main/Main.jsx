@@ -56,28 +56,28 @@ const Main = () => {
               <div className={`image-wrapper ${isLoaded ? 'animate-scale-in' : ''}`}>
                 <div className="blob-bg"></div>
                 <img
-                  src="https://firebasestorage.googleapis.com/v0/b/authentication-5c66e.appspot.com/o/Main%20Photo%20starting%2Fmain.jpg?alt=media&token=ba8fb2e4-ac84-4449-bcee-a573884634ca"
+                  src="/img/Heroimage.png"
                   className="img-fluid main-img"
                   alt="Delicious South Indian Meal"
                   loading="eager"
                 />
 
                 {/* Floating Card Element */}
-                <div className="floating-card card-1">
+                {/* <div className="floating-card card-1">
                   <i className="fas fa-motorcycle icon-bg"></i>
                   <div className="card-content">
                     <span className="card-title">Fast Delivery</span>
                     <span className="card-sub">Within 30 mins</span>
                   </div>
-                </div>
+                </div> */}
 
-                <div className="floating-card card-2">
+                {/* <div className="floating-card card-2">
                   <i className="fas fa-leaf icon-bg-green"></i>
                   <div className="card-content">
                     <span className="card-title">100% Veg</span>
                     <span className="card-sub">Pure & Fresh</span>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 

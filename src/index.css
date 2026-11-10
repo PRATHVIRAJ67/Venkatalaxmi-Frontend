@@ -106,3 +106,55 @@ button {
 .fade-in {
   animation: fadeIn 0.6s ease forwards;
 }
+/* Shared section headings (Gallery, Testimonials, Contact).
+   The extra .container makes these win over older per-section .section-title rules. */
+.container.section-title {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.container.section-title h2 {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin: 0 0 8px;
+}
+
+.container.section-title p,
+.container.section-title p span {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.container.section-title p .highlight,
+.container.section-title p .description-title,
+.section-header .title .text-primary {
+  color: var(--primary-color) !important;
+}
+
+@media (max-width: 576px) {
+  .container.section-title p,
+  .container.section-title p span {
+    font-size: 26px;
+  }
+}
+
+.footer-section a {
+  text-decoration: none;
+}
+
+.footer-section a:hover {
+  color: var(--primary-color);
+}
+
+.info-card .info-content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

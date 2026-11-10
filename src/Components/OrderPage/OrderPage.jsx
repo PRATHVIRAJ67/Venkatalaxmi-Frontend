@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import './OrderPage.css';
-import { AiOutlinePlus, AiOutlineMinus, AiOutlineArrowLeft } from 'react-icons/ai';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
+import { AiOutlinePlus, AiOutlineMinus } from 'react-icons/ai';
 import { fetchMenuItems as fetchMenuItemsAPI } from './service';
 import useSEO from '../hooks/useSEO';
 import { useCart } from '../hooks/useCart';
@@ -14,11 +12,19 @@ import ChatBotIcon from '../Landing/Chatbot/ChatBotIcon';
 
 // Menu categories with their icons
 const menuCategories = [
-  { id: 'menu-starters', title: 'Sweets', icon: 'fas fa-birthday-cake' },
-  { id: 'menu-breakfast', title: 'Breakfast', icon: 'fas fa-mug-hot' },
-  { id: 'menu-lunch', title: 'Lunch', icon: 'fas fa-egg' },
-  { id: 'menu-dinner', title: 'Snacks', icon: 'fas fa-shopping-basket' }
+  { id: 'menu-starters', title: 'Sweets', icon: 'fas fa-birthday-cake', hours: 'All day', minNote: 'Min. 50 pcs' },
+  { id: 'menu-breakfast', title: 'Breakfast', icon: 'fas fa-mug-hot', hours: '7:00 – 11:30 AM' },
+  { id: 'menu-lunch', title: 'Lunch', icon: 'fas fa-bowl-rice', hours: '11:30 AM – 4:00 PM' },
+  { id: 'menu-dinner', title: 'Snacks', icon: 'fas fa-cookie-bite', hours: 'All day', minNote: 'Min. 10 packs' }
 ];
+
+// Splits "Jilebi (ಜಿಲೇಬಿ)" into the English name and the Kannada name
+const splitItemName = (name = '') => {
+  const match = name.match(/^(.*?)\s*\((.+)\)\s*$/);
+  return match ? { main: match[1], local: match[2] } : { main: name, local: '' };
+};
+
+const formatUnit = (unit) => (unit ? unit.replace(/-/g, ' ') : '');
 
 // Helper functions
 const getCurrentDayOfWeek = () => {
@@ -89,10 +95,6 @@ const OrderPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPagesFromServer, setTotalPagesFromServer] = useState(1);
 
-  const cartRef = useRef(null);
-  const [position, setPosition] = useState({ top: 80, left: 0 });
-  const [dragging, setDragging] = useState(false);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
   const { cart: cartFromUseCart, setCart: setCartFromUseCart } = useCart();
   const [daySpecificMenu, setDaySpecificMenu] = useState({});
 
@@ -135,76 +137,6 @@ const OrderPage = () => {
     return () => clearInterval(intervalId);
   }, [currentPage, activeTab]);
 
-  useEffect(() => {
-    // Set responsive initial position once cartRef is available
-    const setInitialPosition = () => {
-      if (cartRef.current) {
-        const isMobile = window.innerWidth <= 768;
-        const cartWidth = cartRef.current.offsetWidth;
-        const cartHeight = cartRef.current.offsetHeight;
-
-        const defaultLeft = isMobile
-          ? window.innerWidth - cartWidth - 20
-          : window.innerWidth - cartWidth - 40;
-
-        const defaultTop = 80;
-
-        setPosition({
-          top: Math.min(defaultTop, window.innerHeight - cartHeight),
-          left: Math.min(defaultLeft, window.innerWidth - cartWidth),
-        });
-      }
-    };
-
-    setInitialPosition();
-    window.addEventListener('resize', setInitialPosition);
-
-    return () => {
-      window.removeEventListener('resize', setInitialPosition);
-    };
-  }, []);
-
-  const handleDragStart = (e) => {
-    const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-    const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
-    setDragging(true);
-    setOffset({
-      x: clientX - cartRef.current.getBoundingClientRect().left,
-      y: clientY - cartRef.current.getBoundingClientRect().top,
-    });
-  };
-
-  const handleDragMove = (e) => {
-    if (!dragging) return;
-
-    const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-    const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-
-    const newLeft = clientX - offset.x;
-    const newTop = clientY - offset.y;
-
-    setPosition({
-      top: Math.min(Math.max(newTop, 0), window.innerHeight - cartRef.current.offsetHeight),
-      left: Math.min(Math.max(newLeft, 0), window.innerWidth - cartRef.current.offsetWidth),
-    });
-  };
-
-  const handleDragEnd = () => setDragging(false);
-
-  useEffect(() => {
-    document.addEventListener('mousemove', handleDragMove);
-    document.addEventListener('mouseup', handleDragEnd);
-    document.addEventListener('touchmove', handleDragMove);
-    document.addEventListener('touchend', handleDragEnd);
-
-    return () => {
-      document.removeEventListener('mousemove', handleDragMove);
-      document.removeEventListener('mouseup', handleDragEnd);
-      document.removeEventListener('touchmove', handleDragMove);
-      document.removeEventListener('touchend', handleDragEnd);
-    };
-  }, [dragging, offset]);
 
   useEffect(() => {
     // Get the current day of the week
@@ -571,75 +503,62 @@ const OrderPage = () => {
     return result;
   };
 
+  const cartCount = cart.length;
+
   return (
     <div className="order-page">
       <div id="cart-notification" className="cart-notification">
         <i className="fas fa-check-circle"></i> Item added to cart
       </div>
 
-      {/* Desktop Cart Button */}
-      <div className="cart-section desktop-only"
-        ref={cartRef}
-        onMouseDown={handleDragStart}
-        onTouchStart={handleDragStart}
-        style={{
-          top: `${position.top}px`,
-          left: `${position.left}px`,
-          position: 'fixed',
-          cursor: 'grab',
-        }}>
-        <Link to="/cart" className="cart-view-wrapper">
-          <div className="cart-toggle">
-            <i className="fas fa-shopping-cart cart-icon-bootstrap"></i>
-            {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
+      <div className="order-hero">
+        <div className="container">
+          <div className="order-topbar">
+            <Link to="/" className="order-back" title="Back to home">
+              <i className="fas fa-arrow-left"></i> <span>Back</span>
+            </Link>
+            <Link to="/" className="order-brand">
+              <img src="/Venkatalakshmi-Logo.png" alt="Venkatalakshmi Mess" />
+            </Link>
+            <Link to="/cart" className="order-cart-chip" aria-label="View cart">
+              <i className="fas fa-shopping-bag"></i>
+              <span className="order-cart-chip-label">Cart</span>
+              {cartCount > 0 && <span className="order-cart-chip-badge">{cartCount}</span>}
+            </Link>
           </div>
-          <div className="view-cart-link">
-            <i className="fas fa-shopping-bag"></i> View Cart
+
+          <div className="order-hero-text">
+            <span className="order-eyebrow">Our {currentDayOfWeek} selection</span>
+            <h1>Order your food</h1>
+            <p>Freshly prepared, homely South Indian food — pick a category to get started.</p>
           </div>
-        </Link>
+        </div>
       </div>
 
-      {/* Mobile Cart Button (circular) */}
-      <Link to="/cart" className="mobile-cart-button mobile-only">
-        <div className="mobile-cart-icon">
-          <i className="fas fa-shopping-cart"></i>
-          {cart.length > 0 && <span className="mobile-cart-badge">{cart.length}</span>}
-        </div>
-        <span className="mobile-cart-text">View Cart</span>
-      </Link>
-
       <div className="container">
-        <div className="order-header">
-          <Link to="/" className="back-button" title="Back to menu">
-            <i className="fas fa-arrow-circle-left"></i> Back
-          </Link>
-          <h1>Order Your Food</h1>
-          <div className="spacer"></div>
-        </div>
-
-        <div className="menu-tabs-wrapper" id="menu-tabs">
-          <ul className="menu-tabs">
-            {menuCategories.map((category) => {
-              const isAvailable = availableCategories.includes(category.id);
-              return (
-                <li key={category.id} className="menu-tab-item">
-                  <button
-                    className={`menu-tab-button ${activeTab === category.id ? 'active' : ''} ${!isAvailable ? 'disabled' : ''}`}
-                    onClick={() => handleTabChange(category.id)}
-                    disabled={!isAvailable}
-                  >
-                    <i className={`${category.icon}`}></i>
-                    <h4>{category.title}</h4>
-                    {!isAvailable && (
-                      <span className="lock-icon">
-                        <FontAwesomeIcon icon={faLock} />
-                      </span>
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+        <div className="order-tabs" id="menu-tabs" role="tablist">
+          {menuCategories.map((category) => {
+            const isAvailable = availableCategories.includes(category.id);
+            const isActive = activeTab === category.id;
+            return (
+              <button
+                key={category.id}
+                role="tab"
+                aria-selected={isActive}
+                className={`order-tab ${isActive ? 'active' : ''} ${!isAvailable ? 'locked' : ''}`}
+                onClick={() => handleTabChange(category.id)}
+                disabled={!isAvailable}
+              >
+                <span className="order-tab-icon"><i className={category.icon}></i></span>
+                <span className="order-tab-text">
+                  <strong>{category.title}</strong>
+                  <small>
+                    {isAvailable ? category.hours : <><i className="fas fa-lock"></i> {category.hours}</>}
+                  </small>
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="menu-content">
@@ -648,188 +567,178 @@ const OrderPage = () => {
               <div className="loading-spinner"></div>
             </div>
           ) : (
-            menuCategories.map((category) => (
-              <div
-                key={category.id}
-                className={`menu-tab-content ${activeTab === category.id ? 'active' : ''}`}
-                id={category.id}
-                style={{ display: activeTab === category.id ? 'block' : 'none' }}
-              >
-                <div className="menu-header">
-                  <p>Our {currentDayOfWeek} Selection</p>
-                  <h3>{category.title}</h3>
-                  {/* {category.id === 'menu-starters' && (
-                    <div className="menu-available-message">
-                      <p><strong> Note:</strong> For Sweets minimum order quantity is 50 pieces </p>
-                    </div>
-                  )} */}
-                  {!availableCategories.includes(category.id) && (
-                    <div className="menu-unavailable-message">
-                      <i className="fas fa-clock"></i> This menu is not available at this time
-                    </div>
-                  )}
-                </div>
+            menuCategories.map((category) => {
+              if (activeTab !== category.id) return null;
+              const items = getItemsForCategory(category.id);
+              const isSweetsCategory = category.id === 'menu-starters';
+              const isSnacksCategory = category.id === 'menu-dinner';
 
-                {availableCategories.includes(category.id) ? (
-                  <>
-                    <div className="order-items-grid">
-                      {getItemsForCategory(category.id).length > 0 ? (
-                        getItemsForCategory(category.id).map((item) => {
-                          const cartItem = cart.find(cartItem => cartItem.id === item.id);
-                          const quantity = cartItem ? cartItem.quantity : 0;
-                          const isSweetsCategory = category.id === 'menu-starters';
+              return (
+                <div key={category.id} className="menu-tab-content active" id={category.id}>
+                  <div className="order-section-head">
+                    <h2>{category.title}</h2>
+                    {category.minNote && (
+                      <span className="order-min-note">
+                        <i className="fas fa-circle-info"></i> {category.minNote} per order
+                      </span>
+                    )}
+                  </div>
 
-                          return (
-                            <div className="order-item" key={item.id}>
-                              <div className="order-item-img-container">
-                                <img
-                                  src={item.img && item.img.startsWith('http') ? item.img : `/img/menu/${item.img || 'placeholder.jpg'}`}
-                                  className="order-img"
-                                  alt={item.name}
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = "/img/menu/placeholder.jpg";
-                                  }}
-                                  loading="lazy"
-                                />
-                                <div className="order-item-overlay">
-                                  {/* <button className="view-details-button">
-                                    <i className="bi bi-eye"></i>
-                                  </button> */}
+                  {availableCategories.includes(category.id) ? (
+                    <>
+                      <div className="order-grid">
+                        {items.length > 0 ? (
+                          items.map((item) => {
+                            const cartItem = cart.find(c => c.id === item.id);
+                            const quantity = cartItem ? cartItem.quantity : 0;
+                            const { main, local } = splitItemName(item.name);
+
+                            return (
+                              <article className={`food-card ${quantity > 0 ? 'in-cart' : ''}`} key={item.id}>
+                                <div className="food-card-media">
+                                  <img
+                                    src={item.img && item.img.startsWith('http') ? item.img : `/img/menu/${item.img || 'placeholder.jpg'}`}
+                                    alt={main}
+                                    loading="lazy"
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.style.display = 'none';
+                                      e.target.parentElement.classList.add('no-image');
+                                    }}
+                                  />
+                                  <span className="food-card-veg" title="Vegetarian"></span>
+                                  {quantity > 0 && (
+                                    <span className="food-card-incart">
+                                      <i className="fas fa-check"></i> {quantity} in cart
+                                    </span>
+                                  )}
                                 </div>
-                              </div>
-                              <div className="order-item-info">
-                                <h4>{item.name.replace(/([a-zA-Z])\(/, '$1      (')}</h4>
-                                <p className="ingredients">{item.description}</p>
-                                <p className="price">₹{item.price} {item.unit && `(${item.unit})`}</p>
 
-                                <div className="order-actions">
-                                  {quantity > 0 ? (
-                                    <div className="quantity-selector">
-                                      <button
-                                        onClick={() => handleQuantityChange(item.id, 'subtract', category.id)}
-                                        className="quantity-btn"
-                                        aria-label="Decrease quantity"
-                                      >
-                                        <AiOutlineMinus style={{ color: 'black' }} />
-                                      </button>
+                                <div className="food-card-body">
+                                  <h3 className="food-card-title">{main}</h3>
+                                  {local && <p className="food-card-local">{local}</p>}
+                                  {item.description && <p className="food-card-desc">{item.description}</p>}
 
-                                      {editingQuantity === item.id ? (
-                                        <input
-                                          type="number"
-                                          className="quantity-input"
-                                          defaultValue={quantity}
-                                          min={isSweetsCategory ? 50 : (category.id === 'menu-dinner' ? 10 : 1)}
-                                          step={isSweetsCategory ? 10 : 1}
-                                          onBlur={(e) => handleQuantityInputBlur(item.id, e.target.value, category.id)}
-                                          onKeyDown={(e) => handleQuantityInputKeyDown(e, item.id, e.target.value, category.id)}
-                                          autoFocus
-                                          aria-label="Edit quantity"
-                                          readOnly={isSweetsCategory}
-                                        />
-                                      ) : (
-                                        <>
+                                  <div className="food-card-footer">
+                                    <div className="food-card-price">
+                                      <strong>₹{item.price}</strong>
+                                      {item.unit && <span>/ {formatUnit(item.unit)}</span>}
+                                    </div>
+
+                                    {quantity > 0 ? (
+                                      <div className="food-qty">
+                                        <button
+                                          onClick={() => handleQuantityChange(item.id, 'subtract', category.id)}
+                                          aria-label="Decrease quantity"
+                                        >
+                                          <AiOutlineMinus />
+                                        </button>
+
+                                        {editingQuantity === item.id ? (
+                                          <input
+                                            type="number"
+                                            defaultValue={quantity}
+                                            min={isSweetsCategory ? 50 : (isSnacksCategory ? 10 : 1)}
+                                            step={isSweetsCategory ? 10 : 1}
+                                            onBlur={(e) => handleQuantityInputBlur(item.id, e.target.value, category.id)}
+                                            onKeyDown={(e) => handleQuantityInputKeyDown(e, item.id, e.target.value, category.id)}
+                                            autoFocus
+                                            aria-label="Edit quantity"
+                                          />
+                                        ) : (
                                           <span
-                                            className="quantity"
-                                            onClick={() => !isSweetsCategory && handleQuantityInputFocus(item.id)}
+                                            className="food-qty-value"
+                                            onClick={() => handleQuantityInputFocus(item.id)}
+                                            title="Click to type a quantity"
                                           >
                                             {quantity}
                                           </span>
-                                          {(
-                                            <button
-                                              className="quantity-edit-btn"
-                                              onClick={() => handleQuantityInputFocus(item.id)}
-                                              title="Enter quantity manually"
-                                              aria-label="Edit quantity manually"
-                                            >
-                                              <i className="fas fa-pencil-alt"></i>
-                                              <span> Enter quantity manually</span>
-                                            </button>
-                                          )}
-                                        </>
-                                      )}
+                                        )}
 
+                                        <button
+                                          onClick={() => handleQuantityChange(item.id, 'add', category.id)}
+                                          aria-label="Increase quantity"
+                                        >
+                                          <AiOutlinePlus />
+                                        </button>
+                                      </div>
+                                    ) : (
                                       <button
-                                        onClick={() => handleQuantityChange(item.id, 'add', category.id)}
-                                        className="quantity-btn"
-                                        aria-label="Increase quantity"
+                                        className="food-add"
+                                        onClick={() => addToCart(item, category.id)}
+                                        aria-label={isSweetsCategory ? 'Add 50 pieces to cart' : (isSnacksCategory ? 'Add 10 packs to cart' : 'Add to cart')}
                                       >
-                                        <AiOutlinePlus style={{ color: 'black' }} />
+                                        <i className="fas fa-plus"></i> {isSweetsCategory ? 'Add 50' : (isSnacksCategory ? 'Add 10' : 'Add')}
                                       </button>
-                                    </div>
-                                  ) : (
-                                    <button
-                                      className="add-to-cart-button"
-                                      onClick={() => addToCart(item, category.id)}
-                                      aria-label={isSweetsCategory ? 'Add 50 pieces to cart' : (category.id === 'menu-dinner' ? 'Add 10 packs to cart' : 'Add to cart')}
-                                    >
-                                      <i className="fas fa-cart-plus"></i> {isSweetsCategory ? 'Add 50 pieces' : (category.id === 'menu-dinner' ? 'Add 10 pack' : 'Add to Cart')}
-                                    </button>
-                                  )}
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="no-items-message">
-                          <p>No special menu items available for {currentDayOfWeek} in this category.</p>
-                        </div>
-                      )}
-                    </div>
+                              </article>
+                            );
+                          })
+                        ) : (
+                          <div className="order-empty">
+                            <i className="fas fa-utensils"></i>
+                            <p>No items available for {currentDayOfWeek} in this category.</p>
+                          </div>
+                        )}
+                      </div>
 
-                    {/* Server-side pagination controls */}
-                    {totalPagesFromServer > 1 && (
-                      <div className="simple-pagination">
-                        <button
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={currentPage === 1}
-                          className="pagination-arrow"
-                        >
-                          <i className="fas fa-chevron-left"></i>
-                        </button>
-
-                        <div className="pagination-numbers">
+                      {totalPagesFromServer > 1 && (
+                        <div className="order-pagination">
+                          <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            aria-label="Previous page"
+                          >
+                            <i className="fas fa-chevron-left"></i>
+                          </button>
                           {[...Array(totalPagesFromServer)].map((_, i) => (
                             <button
                               key={i + 1}
-                              className={`pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
+                              className={currentPage === i + 1 ? 'active' : ''}
                               onClick={() => handlePageChange(i + 1)}
                             >
                               {i + 1}
                             </button>
                           ))}
+                          <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPagesFromServer}
+                            aria-label="Next page"
+                          >
+                            <i className="fas fa-chevron-right"></i>
+                          </button>
                         </div>
-
-                        <button
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={currentPage === totalPagesFromServer}
-                          className="pagination-arrow"
-                        >
-                          <i className="fas fa-chevron-right"></i>
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="locked-menu-content">
-                    <div className="locked-menu-message">
-                      <i className="fas fa-lock"></i>
-                      <h3>This menu is currently unavailable</h3>
-                      <p>Please check back during the appropriate hours:</p>
-                      <ul>
-                        <li><strong>Breakfast:</strong> 5:00 AM - 11:00 AM</li>
-                        <li><strong>Lunch:</strong> 11:00 AM - 5:00 PM</li>
-                        <li><strong>Dinner:</strong> 5:00 PM - 5:00 AM</li>
-                      </ul>
+                      )}
+                    </>
+                  ) : (
+                    <div className="order-locked">
+                      <i className="fas fa-clock"></i>
+                      <h3>{category.title} isn’t being served right now</h3>
+                      <p>Available {category.hours}. Sweets and snacks can be ordered any time.</p>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       </div>
+
+      {cartCount > 0 && (
+        <div className="order-cartbar">
+          <div className="order-cartbar-inner">
+            <div className="order-cartbar-info">
+              <span>{cartCount} {cartCount === 1 ? 'item' : 'items'}</span>
+              <strong>₹{totalAmount.toLocaleString('en-IN')}</strong>
+            </div>
+            <button className="order-cartbar-btn" onClick={handleCheckout}>
+              View Cart <i className="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

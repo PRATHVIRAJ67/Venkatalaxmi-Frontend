@@ -29,19 +29,25 @@
 }
 
 .section-title .highlight {
-  color: var(--accent-color, #ce1212);
+  color: var(--primary-color);
   font-weight: 700;
 }
 
 
 .testimonials-slider {
-  padding-bottom: 60px;
-  margin-bottom: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 0;
 }
 
 
+/* Equal-height slides so the slider doesn't leave a gap under shorter reviews */
+.testimonials-slider .swiper-slide {
+  height: auto;
+}
+
 .testimonial-item {
   padding: 20px;
+  height: 100%;
 }
 
 .testimonial-wrapper {
@@ -51,8 +57,9 @@
   align-items: center;
   justify-content: center;
   gap: 30px;
+  height: 100%;
   background-color: #fff;
-  border-radius: 10px;
+  border-radius: 16px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
   padding: 30px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -65,7 +72,7 @@
 
 .testimonial-content {
   flex: 1 1 500px;
-  border-left: 4px solid var(--accent-color, #ce1212);
+  border-left: 4px solid var(--primary-color);
   padding-left: 30px;
   order: 1;
 }
@@ -81,7 +88,7 @@
 
 .quote-icon-left,
 .quote-icon-right {
-  color: rgba(var(--accent-color-rgb, 206, 18, 18), 0.5);
+  color: rgba(255, 82, 0, 0.5);
   font-size: 26px;
   line-height: 0;
   vertical-align: middle;
@@ -144,7 +151,7 @@
   object-fit: cover;
   border-radius: 50%;
   border: 5px solid #fff;
-  box-shadow: 0 0 20px rgba(var(--accent-color-rgb, 206, 18, 18), 0.15);
+  box-shadow: 0 0 20px rgba(255, 82, 0, 0.15);
   transition: transform 0.3s ease;
 }
 
@@ -168,7 +175,7 @@
 }
 
 .testimonials-slider .swiper-pagination-bullet-active {
-  background-color: var(--accent-color, #ce1212);
+  background-color: var(--primary-color);
   width: 25px;
   border-radius: 6px;
 }
@@ -176,20 +183,27 @@
 
 @media (max-width: 992px) {
   .testimonial-wrapper {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 16px;
     padding: 25px 20px;
   }
-  
+
   .testimonial-content {
-    flex: 1 1 100%;
+    flex: 0 0 auto;
+    width: 100%;
     order: 2;
-    border-left: 3px solid var(--accent-color, #ce1212);
+    border-left: 3px solid var(--primary-color);
     padding-left: 20px;
-    margin-top: 20px;
+  }
+
+  .author-info {
+    margin-top: 12px;
   }
   
   .testimonial-image-container {
     order: 1;
-    margin: 0 auto 15px;
+    margin: 0 auto;
   }
   
   .testimonial-img {

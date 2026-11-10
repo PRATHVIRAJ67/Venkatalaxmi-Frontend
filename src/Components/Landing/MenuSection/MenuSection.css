@@ -256,7 +256,7 @@
   .tabs-wrapper {
     position: relative;
     overflow: hidden;
-    margin: 0 -15px 30px -15px;
+    margin: 0 calc(var(--bs-gutter-x, 1.5rem) * -0.5) 30px;
     padding: 0;
     justify-content: flex-start;
   }
@@ -438,5 +438,33 @@
   .add-btn {
     font-size: 12px;
     padding: 8px;
+  }
+}
+/* Two cards per row on phones */
+@media (max-width: 575px) {
+  .menu-section .row.g-4 {
+    --bs-gutter-x: 12px;
+    --bs-gutter-y: 12px;
+  }
+
+  .card-image {
+    height: 120px;
+  }
+
+  .product-name {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .product-desc {
+    display: none;
+  }
+
+  .card-details {
+    padding: 10px;
+  }
+
+  .add-btn {
+    margin-top: 8px;
   }
 }

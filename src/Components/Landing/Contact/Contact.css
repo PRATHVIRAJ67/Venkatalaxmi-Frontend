@@ -1,5 +1,5 @@
 .contact-section {
-  padding: 0;
+  padding: 64px 0 0;
   position: relative;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .section-title .highlight {
-  color: var(--accent-color, #ce1212);
+  color: var(--primary-color);
   font-weight: 700;
 }
 
@@ -80,7 +80,7 @@
   width: 48px;
   height: 48px;
   color: var(--contrast-color, #fff);
-  background-color: var(--accent-color, #ce1212);
+  background-color: var(--primary-color);
   font-size: 20px;
   border-radius: 50%;
   transition: all 0.3s ease;
@@ -151,8 +151,8 @@
 
 .form-control:focus {
   outline: none;
-  border-color: var(--accent-color, #ce1212);
-  box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb, 206, 18, 18), 0.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 82, 0, 0.15);
 }
 
 .form-control::placeholder {
@@ -232,7 +232,7 @@
 .submit-button {
   display: inline-block;
   padding: 10px 25px;
-  background-color: var(--accent-color, #ce1212);
+  background-color: var(--primary-color);
   color: var(--contrast-color, #fff);
   font-size: 16px;
   font-weight: 600;
@@ -245,9 +245,9 @@
 
 .submit-button:hover, 
 .submit-button:focus {
-  background-color: rgba(var(--accent-color-rgb, 206, 18, 18), 0.9);
+  background-color: rgba(255, 82, 0, 0.9);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(var(--accent-color-rgb, 206, 18, 18), 0.3);
+  box-shadow: 0 5px 15px rgba(255, 82, 0, 0.3);
 }
 
 .submit-button:active {

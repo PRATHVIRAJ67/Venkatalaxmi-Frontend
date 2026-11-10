@@ -114,7 +114,7 @@ const MenuSection = () => {
             <div className="row g-4 justify-content-center">
               {getDisplayItems(activeTab).length > 0 ? (
                 getDisplayItems(activeTab).map((item, index) => (
-                  <div key={item.id || index} className="col-lg-3 col-md-4 col-sm-6 animate-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div key={item.id || index} className="col-lg-3 col-md-4 col-6 animate-up" style={{ animationDelay: `${index * 0.1}s` }}>
                     <div className="product-card" onClick={handleCardClick}>
                       <div className="card-image">
                         <img

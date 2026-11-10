@@ -33,6 +33,7 @@
   border-radius: 8px;
   width: 100%;
   height: auto;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
 }
 
@@ -50,7 +51,7 @@
 }
 
 .gallery .swiper-pagination .swiper-pagination-bullet-active {
-  background-color: var(--accent-color);
+  background-color: var(--primary-color);
   width: 24px;
   border-radius: 5px;
 }
@@ -58,5 +59,14 @@
 @media (min-width: 992px) {
   .gallery .swiper-slide-active {
     transform: scale(1.2); /* More pronounced scale for desktop */
+  }
+}
+@media (max-width: 576px) {
+  .gallery .swiper-wrapper {
+    padding: 20px 0;
+  }
+
+  .gallery .swiper-pagination {
+    margin-top: 12px;
   }
 }

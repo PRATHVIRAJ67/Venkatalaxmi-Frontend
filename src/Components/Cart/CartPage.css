@@ -22,7 +22,7 @@
   font-size: 36px;
   font-weight: 700;
   margin: 10px 0 5px;
-  background: linear-gradient(90deg, #ce1212, #ff6666);
+  background: linear-gradient(90deg, #ff5200, #ff7a33);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -56,8 +56,8 @@
   top: 50%;
   transform: translateY(-50%);
   background-color: #fff;
-  border: 1px solid #ff6666;
-  color: #ff6666;
+  border: 1px solid #ff7a33;
+  color: #ff7a33;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -71,7 +71,7 @@
 }
 
 .back-button:hover {
-  background-color: #ff6666;
+  background-color: #ff7a33;
   color: #fff;
   transform: translateY(-50%) scale(1.03);
 }
@@ -143,7 +143,7 @@
 }
 
 .browse-menu-button {
-  background-color: #ce1212;
+  background-color: #ff5200;
   color: white;
   border: none;
   padding: 12px 25px;
@@ -265,7 +265,7 @@
 }
 
 .remove-item-button:hover {
-  color: #ce1212;
+  color: #ff5200;
 }
 
 .cart-actions {
@@ -333,7 +333,7 @@
 }
 
 .checkout-button {
-  background-color: #ce1212;
+  background-color: #ff5200;
   color: white;
   border: none;
   width: 100%;
@@ -371,7 +371,7 @@
 }
 
 .delivery-option input[type="radio"] {
-  accent-color: #ce1212;
+  accent-color: #ff5200;
 }
 
 .promo-code-section {
@@ -400,11 +400,11 @@
 
 .promo-input input:focus {
   outline: none;
-  border-color: #ce1212;
+  border-color: #ff5200;
 }
 
 .promo-button {
-  background-color: #ce1212;
+  background-color: #ff5200;
   color: white;
   border: none;
   padding: 0 15px;
@@ -588,14 +588,14 @@
 }
 
 .confirm-dialog-confirm {
-  background: linear-gradient(135deg, #ce1212, #ff4444);
+  background: linear-gradient(135deg, #ff5200, #ff7a33);
   color: #fff;
 }
 
 .confirm-dialog-confirm:hover {
   background: linear-gradient(135deg, #b00, #e03030);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(206, 18, 18, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 82, 0, 0.3);
 }
 
 @keyframes slideUp {

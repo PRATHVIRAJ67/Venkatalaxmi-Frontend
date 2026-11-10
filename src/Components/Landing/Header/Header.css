@@ -299,3 +299,57 @@
     font-size: 15px;
   }
 }
+
+/* Mobile menu fixes:
+   - Bootstrap's .navbar sets position: relative, which squeezed the open menu to 0px,
+     so the open state needs a more specific selector.
+   - backdrop-filter on the scrolled header traps fixed children inside the 60px bar. */
+@media (max-width: 991px) {
+  .header.scrolled {
+    backdrop-filter: none;
+  }
+
+  .header .navbar.navbar-mobile {
+    position: fixed;
+    inset: 0;
+    display: block;
+    padding: 0;
+  }
+
+  body.mobile-nav-active .mobile-nav-toggle {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    transform: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+
+  body.mobile-nav-active {
+    overflow: hidden;
+  }
+}
+
+/* Tap leaves :hover stuck on phones, so only colour the toggle on hover with a mouse */
+.mobile-nav-toggle:hover {
+  color: var(--secondary-color);
+}
+
+@media (hover: hover) {
+  .mobile-nav-toggle:hover {
+    color: var(--primary-color);
+  }
+}
+
+@media (max-width: 991px) {
+  .header .navbar.navbar-mobile ul {
+    bottom: auto;
+    max-height: calc(100vh - 90px);
+    padding: 8px 0;
+  }
+}

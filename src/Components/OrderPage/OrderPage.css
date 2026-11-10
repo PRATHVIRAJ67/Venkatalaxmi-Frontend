@@ -677,21 +677,24 @@
     flex-direction: row;
   }
 
-  .order-page .food-card-media {
-    flex: 0 0 128px;
-    aspect-ratio: auto;
-    min-height: 150px;
+  .order-page .food-card {
+    align-items: flex-start;
+    padding: 12px;
+    gap: 12px;
   }
 
-  /* Fill the full card height instead of leaving a gap under the photo */
-  .order-page .food-card-media img {
-    position: absolute;
-    inset: 0;
+  /* Landscape thumbnail so wide thali photos aren't cropped into a tall strip */
+  .order-page .food-card-media {
+    flex: 0 0 120px;
+    width: 120px;
+    aspect-ratio: 6 / 5;
+    border-radius: 12px;
   }
 
   .order-page .food-card-body {
-    padding: 12px 14px;
+    padding: 0;
     min-width: 0;
+    align-self: stretch;
   }
 
   .order-page .food-card-title {

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MenuSection.css';
 
-import { fetchMenuItems } from '../../../services/menuService';
+import { fetchMenuItems, getCachedMenuPreview } from '../../../services/menuService';
 
 const MenuSection = () => {
   const [activeTab, setActiveTab] = useState('menu-starters');
-  const [menuItemsFromDB, setMenuItemsFromDB] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Show the cached preview instantly; only show the spinner on the very first visit
+  const [cachedPreview] = useState(getCachedMenuPreview);
+  const [menuItemsFromDB, setMenuItemsFromDB] = useState(cachedPreview?.items || []);
+  const [isLoading, setIsLoading] = useState(!cachedPreview);
 
   const [itemsPerPage] = useState(6); // Show 6 items per category on landing
   const navigate = useNavigate();
@@ -20,21 +22,22 @@ const MenuSection = () => {
   ];
 
   useEffect(() => {
+    // A fresh cache needs no request; a stale one is refreshed quietly in the background
+    if (cachedPreview && !cachedPreview.isStale) return;
+
     const fetchItems = async () => {
-      setIsLoading(true);
       const { data, error } = await fetchMenuItems();
-      console.log(data);
 
       if (error) {
         console.error('Error fetching menu items:', error);
-      } else {
-        setMenuItemsFromDB(data || []);
+      } else if (data && data.length > 0) {
+        setMenuItemsFromDB(data);
       }
       setIsLoading(false);
     };
 
     fetchItems();
-  }, []);
+  }, [cachedPreview]);
 
   const getMenuItemsByCategory = () => {
     const result = {

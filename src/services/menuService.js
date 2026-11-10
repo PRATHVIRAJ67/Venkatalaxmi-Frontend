@@ -49,25 +49,53 @@ export const getAvailableCategories = () => {
   return available;
 };
 
+// Landing page preview cache. The home page only shows a preview, so it is
+// served from localStorage; the order page always fetches fresh data.
+const PREVIEW_CACHE_KEY = 'vm_menu_preview_v1';
+const PREVIEW_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // refresh in the background after a day
+
+export const getCachedMenuPreview = () => {
+  try {
+    const raw = localStorage.getItem(PREVIEW_CACHE_KEY);
+    if (!raw) return null;
+    const { savedAt, items } = JSON.parse(raw);
+    if (!Array.isArray(items) || items.length === 0) return null;
+    return { items, isStale: Date.now() - savedAt > PREVIEW_CACHE_TTL_MS };
+  } catch {
+    return null;
+  }
+};
+
+const saveMenuPreview = (items) => {
+  try {
+    localStorage.setItem(PREVIEW_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), items }));
+  } catch {
+    // Storage full or blocked (private mode) — the page still works without the cache
+  }
+};
+
 // Fetch menu items for landing page preview (6 items per category)
 export const fetchMenuItems = async () => {
   try {
     const categories = ['menu-starters', 'menu-breakfast', 'menu-lunch', 'menu-dinner'];
-    const allItems = [];
 
-    // Fetch 6 items for each category
-    for (const category of categories) {
-      const response = await axios.get(`${API_BASE_URL}/menu-items`, {
-        params: { category, limit: 6, page: 1 }
-      });
+    // Fetch 6 items for each category in parallel
+    const responses = await Promise.all(
+      categories.map((category) =>
+        axios.get(`${API_BASE_URL}/menu-items`, {
+          params: { category, limit: 6, page: 1 }
+        })
+      )
+    );
 
+    const allItems = responses.flatMap((response) => {
       const categoryData = response.data;
-      const items = Array.isArray(categoryData)
+      return Array.isArray(categoryData)
         ? categoryData
         : (categoryData.menuItems || categoryData.data || []);
+    });
 
-      allItems.push(...items);
-    }
+    if (allItems.length > 0) saveMenuPreview(allItems);
 
     return { data: allItems, error: null };
   } catch (error) {

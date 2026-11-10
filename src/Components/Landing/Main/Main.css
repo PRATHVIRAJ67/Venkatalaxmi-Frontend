@@ -339,3 +339,78 @@
     padding: 14px 20px;
   }
 }
+/* Phone layout: headline first, buttons side by side, compact photo */
+@media (max-width: 991px) {
+  .hero-section {
+    min-height: auto;
+    padding: 96px 0 48px;
+  }
+
+  .hero-section .row {
+    --bs-gutter-y: 2rem;
+  }
+
+  .hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-img .main-img {
+    margin-top: 0;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .blob-bg {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section {
+    padding: 84px 0 40px;
+  }
+
+  .badge-highlight {
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  .hero-title {
+    font-size: 30px;
+    margin-bottom: 14px;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .hero-content .hero-actions.flex-column {
+    flex-direction: row !important;
+    gap: 10px !important;
+  }
+
+  .hero-actions .btn-primary-lg,
+  .hero-actions .btn-secondary-lg {
+    flex: 1 1 0;
+    width: auto;
+    padding: 13px 12px;
+    font-size: 15px;
+  }
+
+  .hero-stats {
+    margin-top: 20px !important;
+    padding-top: 18px !important;
+  }
+
+  .stat-item {
+    align-items: center;
+  }
+}
+
+.btn-primary-lg,
+.btn-secondary-lg {
+  text-decoration: none !important;
+}

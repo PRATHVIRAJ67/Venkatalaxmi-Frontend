@@ -15,7 +15,7 @@ const Main = () => {
         <div className="container">
           <div className="row align-items-center gy-5">
 
-            <div className="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center text-center text-lg-start">
+            <div className="col-lg-6 order-1 d-flex flex-column justify-content-center text-center text-lg-start">
               <div className={`hero-content ${isLoaded ? 'animate-fade-up' : ''}`}>
                 <span className="badge-highlight">
                   <i className="fas fa-star me-2"></i> #1 Food in Kundapura
@@ -52,7 +52,7 @@ const Main = () => {
               </div>
             </div>
 
-            <div className="col-lg-6 order-1 order-lg-2 hero-img text-center">
+            <div className="col-lg-6 order-2 hero-img text-center">
               <div className={`image-wrapper ${isLoaded ? 'animate-scale-in' : ''}`}>
                 <div className="blob-bg"></div>
                 <img

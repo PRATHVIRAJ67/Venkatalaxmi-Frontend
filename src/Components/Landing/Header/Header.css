@@ -282,3 +282,20 @@
     left: 10px;
   }
 }
+/* Logo PNG has a white background — blend it into the header */
+.header .logo img {
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 991px) {
+  .header .logo span {
+    font-size: 17px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .header .logo span {
+    font-size: 15px;
+  }
+}

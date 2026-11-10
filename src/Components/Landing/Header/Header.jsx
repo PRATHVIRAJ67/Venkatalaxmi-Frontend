@@ -31,7 +31,7 @@ const Header = () => {
         <a href="/" className="logo d-flex align-items-center">
           {/* Use logo image or text if image fails to load */}
           <img src="/Venkatalakshmi-Logo.png" alt="Venkatalakshmi Mess" className="img-fluid" />
-          <span className="d-none d-lg-block ms-2">Venkatalakshmi Mess</span>
+          <span className="ms-2">Venkatalakshmi Mess</span>
         </a>
 
         <nav id="navbar" className={`navbar ${isMobileNavActive ? 'navbar-mobile' : ''}`}>
